@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RubriCheck AI | Dashboard</title>
+  <link rel="icon" type="image/png" href="/images/RubriCheck%20Logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="/" aria-label="RubriCheck AI home">
+        <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+        <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link active" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/upload">New Review</a>
+      </nav>
+
+      <div class="auth-area" aria-label="Account actions">
+        <button class="login-button" type="button" data-login-open>Log In</button>
+
+        <a class="user-chip hidden" href="/dashboard" aria-label="Open user dashboard" data-user-chip>
+          <span class="user-icon">DS</span>
+          <span>Demo Student</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="modal-overlay hidden" data-login-modal>
+    <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button class="modal-close" type="button" aria-label="Close login" data-login-close>&times;</button>
+
+      <img class="modal-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+      <h2 id="login-title">Log in to RubriCheck AI</h2>
+      <p>This is a frontend demo login. No real account or password is needed yet.</p>
+
+      <form class="login-form">
+        <label for="demo-email">Email</label>
+        <input id="demo-email" type="email" value="student@myrp.edu.sg" readonly>
+
+        <label for="demo-password">Password</label>
+        <input id="demo-password" type="password" value="password" readonly>
+
+        <button class="btn btn-primary" type="button" data-demo-login>Use Demo Login</button>
+      </form>
+    </section>
+  </div>
+
+  <main class="dashboard-page">
+    <section class="dashboard-shell container">
+      <div class="dashboard-header">
+        <div>
+          <p class="dashboard-kicker">Dashboard</p>
+          <h1>Track your assignment reviews and readiness.</h1>
+          <p>See your current review progress, previous assignment scores, and next steps before submission.</p>
+        </div>
+
+        <a class="btn btn-primary dashboard-new-review" href="/upload">New Review <span aria-hidden="true">+</span></a>
+      </div>
+
+      <section class="summary-grid" aria-label="Dashboard summary">
+        <article class="summary-card">
+          <span class="summary-icon blue">%</span>
+          <strong>84%</strong>
+          <h2>Average Readiness</h2>
+          <p>Across 3 reviews</p>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-icon green">3</span>
+          <strong>3</strong>
+          <h2>Reviews Completed</h2>
+          <p>This semester</p>
+        </article>
+
+        <article class="summary-card">
+          <span class="summary-icon violet">12</span>
+          <strong>12</strong>
+          <h2>Criteria Improved</h2>
+          <p>From feedback actions</p>
+        </article>
+      </section>
+
+      <section class="dashboard-card readiness-card">
+        <div class="card-heading-row">
+          <h2>Current Assignment Readiness</h2>
+          <a href="/feedback">View full feedback <span aria-hidden="true">-&gt;</span></a>
+        </div>
+
+        <div class="readiness-layout">
+          <div class="readiness-score" aria-label="Current readiness score 78 percent">
+            <div class="score-ring dashboard-score-ring">
+              <span>78%</span>
+            </div>
+            <p>Ready with minor improvements</p>
+          </div>
+
+          <div class="dashboard-progress-list">
+            <div class="dashboard-progress-row">
+              <div class="rubric-label">
+                <span>Rubric Coverage</span>
+                <strong>80%</strong>
+              </div>
+              <div class="progress-track">
+                <span class="progress-fill green" style="width: 80%;"></span>
+              </div>
+            </div>
+
+            <div class="dashboard-progress-row">
+              <div class="rubric-label">
+                <span>Explanation Depth</span>
+                <strong>70%</strong>
+              </div>
+              <div class="progress-track">
+                <span class="progress-fill blue" style="width: 70%;"></span>
+              </div>
+            </div>
+
+            <div class="dashboard-progress-row">
+              <div class="rubric-label">
+                <span>Evidence &amp; Examples</span>
+                <strong>75%</strong>
+              </div>
+              <div class="progress-track">
+                <span class="progress-fill orange" style="width: 75%;"></span>
+              </div>
+            </div>
+
+            <div class="dashboard-progress-row">
+              <div class="rubric-label">
+                <span>Formatting</span>
+                <strong>90%</strong>
+              </div>
+              <div class="progress-track">
+                <span class="progress-fill green" style="width: 90%;"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard-card reviews-card">
+        <div class="card-heading-row">
+          <h2>Previous Reviews</h2>
+          <span class="history-icon" aria-hidden="true">↻</span>
+        </div>
+
+        <div class="review-list">
+          <a class="review-row" href="/feedback">
+            <span class="review-score green">82</span>
+            <span class="review-details">
+              <strong>Business Analytics Report</strong>
+              <small>C240 AI Essentials</small>
+            </span>
+            <span class="review-arrow">82% &gt;</span>
+          </a>
+
+          <a class="review-row" href="/feedback">
+            <span class="review-score blue">76</span>
+            <span class="review-details">
+              <strong>Network Security Proposal</strong>
+              <small>C303 IT Project Management</small>
+            </span>
+            <span class="review-arrow">76% &gt;</span>
+          </a>
+
+          <a class="review-row" href="/feedback">
+            <span class="review-score green">88</span>
+            <span class="review-details">
+              <strong>Reflection Journal</strong>
+              <small>A002 Eating Well, Living Well</small>
+            </span>
+            <span class="review-arrow">88% &gt;</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="dashboard-cta dashboard-card">
+        <div>
+          <h2>Ready to start another review?</h2>
+          <p>Upload a new draft and rubric to get fresh feedback before you submit.</p>
+        </div>
+        <a class="btn btn-primary" href="/upload">Start New Review</a>
+      </section>
+    </section>
+  </main>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

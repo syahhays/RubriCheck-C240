@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RubriCheck AI | Questions</title>
+  <link rel="icon" type="image/png" href="/images/RubriCheck%20Logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="/" aria-label="RubriCheck AI home">
+        <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+        <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/upload">New Review</a>
+      </nav>
+
+      <div class="auth-area" aria-label="Account actions">
+        <button class="login-button" type="button" data-login-open>Log In</button>
+
+        <a class="user-chip hidden" href="/dashboard" aria-label="Open user dashboard" data-user-chip>
+          <span class="user-icon">DS</span>
+          <span>Demo Student</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="modal-overlay hidden" data-login-modal>
+    <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button class="modal-close" type="button" aria-label="Close login" data-login-close>&times;</button>
+
+      <img class="modal-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+      <h2 id="login-title">Log in to RubriCheck AI</h2>
+      <p>This is a frontend demo login. No real account or password is needed yet.</p>
+
+      <form class="login-form">
+        <label for="demo-email">Email</label>
+        <input id="demo-email" type="email" value="student@myrp.edu.sg" readonly>
+
+        <label for="demo-password">Password</label>
+        <input id="demo-password" type="password" value="password" readonly>
+
+        <button class="btn btn-primary" type="button" data-demo-login>Use Demo Login</button>
+      </form>
+    </section>
+  </div>
+
+  <main class="questions-page">
+    <section class="questions-shell container">
+      <div class="questions-header">
+        <div>
+          <p class="questions-kicker">Business Analytics Report - Q2 2025</p>
+          <h1>Lecturer Question Prep</h1>
+          <p>Practise possible presentation and viva questions generated from your assignment review.</p>
+        </div>
+
+        <a class="btn btn-secondary" href="/feedback">Back to Feedback Report</a>
+      </div>
+
+      <section class="question-summary-card">
+        <div class="question-summary-icon" aria-hidden="true">AI</div>
+        <div>
+          <h2>AI-generated viva questions</h2>
+          <p>These questions are generated from your assignment, methodology, and identified gaps. Practise answering them out loud before your presentation.</p>
+          <dl>
+            <div>
+              <dt>Assignment</dt>
+              <dd>Business Analytics Report</dd>
+            </div>
+            <div>
+              <dt>Readiness Score</dt>
+              <dd>78%</dd>
+            </div>
+            <div>
+              <dt>Focus Areas</dt>
+              <dd>Explanation depth, evidence, conclusion clarity</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <div class="questions-toolbar">
+        <strong><span data-question-count>6</span> questions generated</strong>
+        <button class="regenerate-button" type="button" data-regenerate-questions>Regenerate Questions</button>
+      </div>
+
+      <section class="question-list" data-question-list aria-label="AI-generated lecturer questions">
+        <article class="question-card">
+          <span class="question-number">1</span>
+          <div>
+            <div class="question-meta">
+              <span>Analysis</span>
+              <em>Medium</em>
+            </div>
+            <h2>Why did you choose this approach for your analysis?</h2>
+          </div>
+        </article>
+
+        <article class="question-card">
+          <span class="question-number">2</span>
+          <div>
+            <div class="question-meta">
+              <span>Rubric</span>
+              <em>Hard</em>
+            </div>
+            <h2>How does your solution meet the rubric criteria?</h2>
+          </div>
+        </article>
+
+        <article class="question-card">
+          <span class="question-number">3</span>
+          <div>
+            <div class="question-meta">
+              <span>Evidence</span>
+              <em>Easy</em>
+            </div>
+            <h2>What evidence supports your main findings?</h2>
+          </div>
+        </article>
+
+        <article class="question-card">
+          <span class="question-number">4</span>
+          <div>
+            <div class="question-meta">
+              <span>Reflection</span>
+              <em>Medium</em>
+            </div>
+            <h2>What limitations did you identify in your assignment?</h2>
+          </div>
+        </article>
+
+        <article class="question-card">
+          <span class="question-number">5</span>
+          <div>
+            <div class="question-meta">
+              <span>Improvement</span>
+              <em>Medium</em>
+            </div>
+            <h2>How would you improve your work if given more time?</h2>
+          </div>
+        </article>
+
+        <article class="question-card">
+          <span class="question-number">6</span>
+          <div>
+            <div class="question-meta">
+              <span>Conclusion</span>
+              <em>Hard</em>
+            </div>
+            <h2>How does your conclusion link back to your objectives?</h2>
+          </div>
+        </article>
+      </section>
+
+      <section class="questions-cta">
+        <span aria-hidden="true">★</span>
+        <h2>Ready to review another assignment?</h2>
+        <p>Upload a new assignment draft and rubric to get another AI-powered review.</p>
+        <a class="btn btn-primary" href="/upload">Review another assignment</a>
+      </section>
+    </section>
+  </main>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

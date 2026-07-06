@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RubriCheck AI | Home</title>
+  <link rel="icon" type="image/png" href="/images/RubriCheck%20Logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="/" aria-label="RubriCheck AI home">
+        <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+        <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link active" href="/">Home</a>
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/upload">New Review</a>
+      </nav>
+
+      <div class="auth-area" aria-label="Account actions">
+        <button class="login-button" type="button" data-login-open>Log In</button>
+
+        <a class="user-chip hidden" href="/dashboard" aria-label="Open user dashboard" data-user-chip>
+          <!-- Placeholder user icon. Replace with profile photo later if needed. -->
+          <span class="user-icon">DS</span>
+          <span>Demo Student</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="modal-overlay hidden" data-login-modal>
+    <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button class="modal-close" type="button" aria-label="Close login" data-login-close>&times;</button>
+
+      <img class="modal-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+      <h2 id="login-title">Log in to RubriCheck AI</h2>
+      <p>This is a frontend demo login. No real account or password is needed yet.</p>
+
+      <form class="login-form">
+        <label for="demo-email">Email</label>
+        <input id="demo-email" type="email" value="student@myrp.edu.sg" readonly>
+
+        <label for="demo-password">Password</label>
+        <input id="demo-password" type="password" value="password" readonly>
+
+        <button class="btn btn-primary" type="button" data-demo-login>Use Demo Login</button>
+      </form>
+    </section>
+  </div>
+
+  <main class="home-page">
+    <section class="hero-section">
+      <div class="container hero-content">
+        <p class="eyebrow">
+          <span class="eyebrow-icon">AI</span>
+          AI-powered assignment review for polytechnic students
+        </p>
+
+        <h1>Know your assignment <span>is ready to submit.</span></h1>
+        <p class="hero-copy">
+          RubriCheck AI analyses your draft against your marking rubric,
+          identifies gaps, and gives you actionable feedback before your
+          lecturer does.
+        </p>
+
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="/upload">Start Reviewing <span aria-hidden="true">-&gt;</span></a>
+          <a class="btn btn-secondary" href="/dashboard">View Dashboard</a>
+        </div>
+
+        <article class="analysis-preview" aria-label="RubriCheck AI live analysis preview">
+          <div class="preview-topbar">
+            <div class="window-dots" aria-hidden="true">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <strong>RubriCheck AI - Live Analysis</strong>
+          </div>
+
+          <div class="preview-body">
+            <div class="score-panel">
+              <p class="panel-label">Readiness Score</p>
+              <div class="score-ring">
+                <span>78</span>
+                <small>/ 100</small>
+              </div>
+              <p class="score-caption">Strong draft</p>
+            </div>
+
+            <div class="rubric-panel">
+              <p class="panel-label">Rubric Coverage</p>
+
+              <div class="rubric-row">
+                <div class="rubric-label">
+                  <span>Research Quality</span>
+                  <strong>90%</strong>
+                </div>
+                <div class="progress-track">
+                  <span class="progress-fill green" style="width: 90%;"></span>
+                </div>
+              </div>
+
+              <div class="rubric-row">
+                <div class="rubric-label">
+                  <span>Critical Analysis</span>
+                  <strong>62%</strong>
+                </div>
+                <div class="progress-track">
+                  <span class="progress-fill blue" style="width: 62%;"></span>
+                </div>
+              </div>
+
+              <div class="rubric-row">
+                <div class="rubric-label">
+                  <span>Formatting &amp; Citations</span>
+                  <strong>55%</strong>
+                </div>
+                <div class="progress-track">
+                  <span class="progress-fill orange" style="width: 55%;"></span>
+                </div>
+              </div>
+
+              <div class="rubric-row">
+                <div class="rubric-label">
+                  <span>Conclusions</span>
+                  <strong>40%</strong>
+                </div>
+                <div class="progress-track">
+                  <span class="progress-fill orange" style="width: 40%;"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="stats-band" aria-label="RubriCheck AI results">
+      <div class="container stats-grid">
+        <div>
+          <strong>94%</strong>
+          <span>Student satisfaction</span>
+        </div>
+        <div>
+          <strong>2.3x</strong>
+          <span>Average grade improvement</span>
+        </div>
+        <div>
+          <strong>15k+</strong>
+          <span>Assignments reviewed</span>
+        </div>
+        <div>
+          <strong>&lt; 60s</strong>
+          <span>Feedback turnaround</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="features-section section-pad">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-kicker">What RubriCheck AI Does</p>
+          <h2>Everything you need before you submit</h2>
+        </div>
+
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-icon blue">AI</span>
+            <h3>AI Rubric Analysis</h3>
+            <p>Upload your marking rubric and let our AI decode every criterion, weighting, and requirement so nothing slips through.</p>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-icon purple">FB</span>
+            <h3>Assignment Feedback</h3>
+            <p>Receive paragraph-level suggestions aligned to rubric criteria. Know exactly what to strengthen before submission.</p>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-icon mint">CL</span>
+            <h3>Submission Checklist</h3>
+            <p>Auto-generated checklist of every requirement. Tick them off one by one and submit with absolute confidence.</p>
+          </article>
+
+          <article class="feature-card">
+            <span class="feature-icon violet">Q</span>
+            <h3>Lecturer Question Generator</h3>
+            <p>Prepare for viva and presentations with AI-generated questions your lecturer is likely to ask based on your work.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="process-section section-pad">
+      <div class="container">
+        <div class="section-heading">
+          <p class="section-kicker">Process</p>
+          <h2>Three steps to submission confidence</h2>
+        </div>
+
+        <div class="process-grid">
+          <article class="process-step">
+            <span>01</span>
+            <h3>Upload</h3>
+            <p>Drop in your assignment draft and marking rubric PDF.</p>
+          </article>
+
+          <article class="process-step">
+            <span>02</span>
+            <h3>Analyse</h3>
+            <p>Our AI reads, compares, and maps your work to every rubric criterion.</p>
+          </article>
+
+          <article class="process-step">
+            <span>03</span>
+            <h3>Improve</h3>
+            <p>Get targeted feedback, a checklist, and question prep, then submit.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container cta-content">
+        <h2>Ready to level up your assignments?</h2>
+        <p>Join thousands of poly students who review smarter, not harder.</p>
+        <a class="btn btn-light" href="/upload">Start your free review <span aria-hidden="true">-&gt;</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <img class="footer-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+        <strong>RubriCheck AI</strong>
+      </div>
+      <p>Built for polytechnic students. &copy; 2025 RubriCheck AI.</p>
+    </div>
+  </footer>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

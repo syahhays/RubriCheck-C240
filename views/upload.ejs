@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RubriCheck AI | Upload</title>
+  <link rel="icon" type="image/png" href="/images/RubriCheck%20Logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="/" aria-label="RubriCheck AI home">
+        <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+        <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link active" href="/upload">New Review</a>
+      </nav>
+
+      <div class="auth-area" aria-label="Account actions">
+        <button class="login-button" type="button" data-login-open>Log In</button>
+
+        <a class="user-chip hidden" href="/dashboard" aria-label="Open user dashboard" data-user-chip>
+          <span class="user-icon">DS</span>
+          <span>Demo Student</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="modal-overlay hidden" data-login-modal>
+    <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button class="modal-close" type="button" aria-label="Close login" data-login-close>&times;</button>
+
+      <img class="modal-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+      <h2 id="login-title">Log in to RubriCheck AI</h2>
+      <p>This is a frontend demo login. No real account or password is needed yet.</p>
+
+      <form class="login-form">
+        <label for="demo-email">Email</label>
+        <input id="demo-email" type="email" value="student@myrp.edu.sg" readonly>
+
+        <label for="demo-password">Password</label>
+        <input id="demo-password" type="password" value="password" readonly>
+
+        <button class="btn btn-primary" type="button" data-demo-login>Use Demo Login</button>
+      </form>
+    </section>
+  </div>
+
+  <main class="upload-page">
+    <section class="upload-shell container">
+      <div class="upload-heading">
+        <span class="upload-page-icon" aria-hidden="true">UP</span>
+        <h1>Upload your documents</h1>
+        <p>Upload your assignment draft and marking rubric. We support PDF and DOCX files.</p>
+      </div>
+
+      <form class="upload-form" action="/analysing" method="get" data-upload-form>
+        <div class="upload-toolbar">
+          <button class="btn btn-secondary load-demo-button" type="button" data-load-demo-files>Load Demo Files</button>
+        </div>
+
+        <div class="upload-card-grid">
+          <article class="upload-card" data-upload-card data-file-key="assignment" data-demo-file="Business_Analytics_Report.docx" data-demo-type="Assignment draft uploaded">
+            <label class="upload-drop-zone" for="assignment-draft">
+              <input id="assignment-draft" class="file-input" type="file" accept=".pdf,.docx" aria-label="Upload assignment draft" data-file-input>
+              <span class="upload-empty-state">
+                <span class="upload-icon" aria-hidden="true">DOC</span>
+                <strong>Assignment Draft</strong>
+                <span>Drag &amp; drop your assignment or click to browse.</span>
+                <small>Supported formats: PDF, DOCX</small>
+              </span>
+            </label>
+
+            <div class="uploaded-state">
+              <span class="uploaded-check" aria-hidden="true">✓</span>
+              <div class="uploaded-file-copy">
+                <strong data-file-name>Business_Analytics_Report.docx</strong>
+                <span data-file-type>Assignment draft uploaded</span>
+              </div>
+              <label class="file-action-link" for="assignment-draft">Replace</label>
+              <button class="remove-file-button" type="button" aria-label="Remove assignment draft" data-remove-file>&times;</button>
+            </div>
+          </article>
+
+          <article class="upload-card" data-upload-card data-file-key="rubric" data-demo-file="Business_Analytics_Rubric.pdf" data-demo-type="Marking rubric uploaded">
+            <label class="upload-drop-zone" for="marking-rubric">
+              <input id="marking-rubric" class="file-input" type="file" accept=".pdf,.docx" aria-label="Upload marking rubric" data-file-input>
+              <span class="upload-empty-state">
+                <span class="upload-icon" aria-hidden="true">RUB</span>
+                <strong>Marking Rubric</strong>
+                <span>Drag &amp; drop your rubric or click to browse.</span>
+                <small>Supported formats: PDF, DOCX</small>
+              </span>
+            </label>
+
+            <div class="uploaded-state">
+              <span class="uploaded-check" aria-hidden="true">✓</span>
+              <div class="uploaded-file-copy">
+                <strong data-file-name>Business_Analytics_Rubric.pdf</strong>
+                <span data-file-type>Marking rubric uploaded</span>
+              </div>
+              <label class="file-action-link" for="marking-rubric">Replace</label>
+              <button class="remove-file-button" type="button" aria-label="Remove marking rubric" data-remove-file>&times;</button>
+            </div>
+          </article>
+        </div>
+
+        <div class="upload-actions">
+          <button class="btn btn-primary analyse-button" type="submit" data-analyse-button disabled>Analyse with AI</button>
+          <p data-upload-note>Both files are required before AI analysis can begin.</p>
+        </div>
+      </form>
+
+      <div class="upload-trust-row" aria-label="Upload demo notes">
+        <span>Files not stored</span>
+        <span>Results in &lt; 60s</span>
+        <span>Rubric-accurate</span>
+      </div>
+    </section>
+  </main>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>
