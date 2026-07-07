@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const userChip = document.querySelector('[data-user-chip]');
   const authArea = document.querySelector('.auth-area');
   const uploadCards = document.querySelectorAll('[data-upload-card]');
+  const uploadForm = document.querySelector('[data-upload-form]');
   const loadDemoFilesButton = document.querySelector('[data-load-demo-files]');
   const analyseButton = document.querySelector('[data-analyse-button]');
   const uploadNote = document.querySelector('[data-upload-note]');
@@ -164,8 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (uploadNote) {
       uploadNote.textContent = allFilesReady
-        ? 'Both files are ready for AI analysis.'
-        : 'Both files are required before AI analysis can begin.';
+        ? 'All three files are ready for AI analysis.'
+        : 'All three files are required before AI analysis can begin.';
     }
   }
 
@@ -185,9 +186,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const selectedFile = fileInput.files[0];
         const fileExtension = selectedFile.name.split('.').pop().toUpperCase();
-        const fileType = card.dataset.fileKey === 'rubric'
-          ? `Marking rubric uploaded - ${fileExtension}`
-          : `Assignment draft uploaded - ${fileExtension}`;
+        let fileLabel = 'Student draft uploaded';
+
+        if (card.dataset.fileKey === 'rubric') {
+          fileLabel = 'Marking rubric uploaded';
+        }
+
+        if (card.dataset.fileKey === 'brief') {
+          fileLabel = 'Assignment brief uploaded';
+        }
+
+        const fileType = `${fileLabel} - ${fileExtension}`;
 
         setCardFile(card, selectedFile.name, fileType);
         updateAnalyseButton();
@@ -213,6 +222,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   updateAnalyseButton();
+
+  if (uploadForm && analyseButton) {
+    uploadForm.addEventListener('submit', () => {
+      analyseButton.disabled = true;
+      analyseButton.textContent = 'Checking your assignment...';
+
+      if (uploadNote) {
+        uploadNote.textContent = 'Please wait while Gemini analyses the uploaded documents.';
+      }
+    });
+  }
 
   if (analysisProgress && analysisPercent && analysisSteps.length > 0) {
     let progress = 17;

@@ -56,171 +56,55 @@
     <section class="feedback-shell container">
       <div class="feedback-header">
         <div>
-          <p class="feedback-kicker">Business Analytics Report - Q2 2025</p>
+          <p class="feedback-kicker">RubriCheck AI report</p>
           <h1>AI Feedback Report</h1>
           <p>Review your assignment readiness and improvement areas before submission.</p>
         </div>
 
         <div class="feedback-actions">
-          <a class="btn btn-secondary" href="/questions">Prepare Lecturer Questions</a>
+          <a class="btn btn-secondary" href="/upload">Check Another Assignment</a>
           <button class="btn btn-primary" type="button" data-download-checklist>Download Checklist</button>
         </div>
       </div>
 
-      <section class="feedback-summary-card">
-        <div class="score-ring feedback-score-ring">
-          <span>78</span>
-          <small>/ 100</small>
-        </div>
+      <% if (!report) { %>
+        <section class="report-empty-state">
+          <h2>No feedback report yet</h2>
+          <p>Upload an assignment brief, marking rubric, and student draft to generate AI feedback.</p>
+          <a class="btn btn-primary" href="/upload">Upload Documents</a>
+        </section>
+      <% } else { %>
+        <section class="feedback-summary-card generated-summary-card">
+          <div class="question-summary-icon" aria-hidden="true">AI</div>
 
-        <div class="feedback-summary-copy">
-          <h2>Overall Readiness: 78%</h2>
-          <span class="status-pill">Almost Ready</span>
-          <p>Your assignment demonstrates solid research and methodology. Key gaps exist in critical evaluation and limitations; addressing these could push your score above 90%.</p>
-        </div>
-
-        <div class="feedback-metrics">
-          <div class="metric-card positive">
-            <strong>4</strong>
-            <span>Strengths</span>
+          <div class="feedback-summary-copy">
+            <h2>Generated from uploaded documents</h2>
+            <span class="status-pill">Gemini feedback</span>
+            <p>This report is based only on the files submitted in this review. It is guidance for completion and readiness, not a grade prediction.</p>
           </div>
-          <div class="metric-card warning">
-            <strong>4</strong>
-            <span>Improvements</span>
-          </div>
-          <div class="metric-card danger">
-            <strong>2</strong>
-            <span>Missing criteria</span>
-          </div>
-        </div>
-      </section>
 
-      <div class="report-tabs" role="tablist" aria-label="Feedback report sections">
-        <button class="report-tab active" type="button" role="tab" aria-selected="true" data-report-tab="overview">Overview</button>
-        <button class="report-tab" type="button" role="tab" aria-selected="false" data-report-tab="suggestions">Suggestions</button>
-        <button class="report-tab" type="button" role="tab" aria-selected="false" data-report-tab="checklist">Checklist</button>
-      </div>
-
-      <section class="report-panel active" data-report-panel="overview">
-        <div class="overview-grid">
-          <article class="report-card accent-green">
-            <h2>Strengths</h2>
-            <ul class="report-list">
-              <li>Clear problem statement with well-defined research objectives in the introduction.</li>
-              <li>Strong literature review using recent sources and relevant industry examples.</li>
-              <li>Methodology section shows good understanding of quantitative research design.</li>
-              <li>Data visualisations are labelled clearly and connected to the findings.</li>
-            </ul>
-          </article>
-
-          <article class="report-card accent-orange">
-            <h2>Areas for Improvement</h2>
-            <ul class="report-list">
-              <li>Explanation depth is uneven in the analysis section and needs clearer reasoning.</li>
-              <li>Some claims need stronger evidence from the dataset or cited references.</li>
-              <li>Conclusion should connect back to the research limitations and rubric criteria.</li>
-              <li>APA 7th citation formatting is inconsistent across several references.</li>
-            </ul>
-          </article>
-        </div>
-
-        <article class="report-card missing-card accent-red">
-          <h2>Missing Rubric Requirements</h2>
-          <div class="missing-grid">
-            <div class="missing-item danger">
-              <strong>Critical Evaluation of Alternatives</strong>
-              <span>20% of total mark</span>
-              <em>Missing</em>
+          <% if (files) { %>
+            <div class="uploaded-file-summary">
+              <div>
+                <strong>Assignment Brief</strong>
+                <span><%= files.assignmentBrief %></span>
+              </div>
+              <div>
+                <strong>Marking Rubric</strong>
+                <span><%= files.markingRubric %></span>
+              </div>
+              <div>
+                <strong>Student Draft</strong>
+                <span><%= files.studentDraft %></span>
+              </div>
             </div>
-            <div class="missing-item warning">
-              <strong>Stakeholder Impact Analysis</strong>
-              <span>10% of total mark</span>
-              <em>Partial</em>
-            </div>
-            <div class="missing-item warning">
-              <strong>Limitations &amp; Future Work</strong>
-              <span>15% of total mark</span>
-              <em>Partial</em>
-            </div>
-            <div class="missing-item danger">
-              <strong>Professional Formatting (APA 7th)</strong>
-              <span>5% of total mark</span>
-              <em>Missing</em>
-            </div>
-          </div>
+          <% } %>
+        </section>
+
+        <article class="ai-report-card">
+          <pre class="ai-report-text"><%= report %></pre>
         </article>
-      </section>
-
-      <section class="report-panel" data-report-panel="suggestions">
-        <article class="suggestion-card">
-          <div>
-            <h2>Critical Evaluation</h2>
-            <span class="priority high">High Priority</span>
-          </div>
-          <p><strong>Issue found:</strong> The report explains your selected solution but does not compare it against alternatives.</p>
-          <p><strong>Suggested improvement:</strong> Add a subsection comparing at least two alternative approaches using cost, feasibility, and impact.</p>
-          <p><strong>Example action:</strong> Add a decision matrix showing why your recommended solution is stronger than the alternatives.</p>
-        </article>
-
-        <article class="suggestion-card">
-          <div>
-            <h2>Explanation Depth</h2>
-            <span class="priority high">High Priority</span>
-          </div>
-          <p><strong>Issue found:</strong> Some analysis paragraphs describe results without explaining what the results mean.</p>
-          <p><strong>Suggested improvement:</strong> After each key finding, add one sentence explaining the implication for the business problem.</p>
-          <p><strong>Example sentence:</strong> "This trend suggests that customer retention is affected more by response time than by discount size."</p>
-        </article>
-
-        <article class="suggestion-card">
-          <div>
-            <h2>Evidence &amp; Examples</h2>
-            <span class="priority medium">Medium</span>
-          </div>
-          <p><strong>Issue found:</strong> Several recommendations are useful but not supported by enough evidence.</p>
-          <p><strong>Suggested improvement:</strong> Link each recommendation to one dataset finding and one academic or industry source.</p>
-          <p><strong>Example action:</strong> Add a citation after your claim about automation improving workflow efficiency.</p>
-        </article>
-
-        <article class="suggestion-card">
-          <div>
-            <h2>Conclusion Clarity</h2>
-            <span class="priority low">Low</span>
-          </div>
-          <p><strong>Issue found:</strong> The conclusion summarises the topic but does not clearly restate how the rubric requirements were met.</p>
-          <p><strong>Suggested improvement:</strong> End with a concise paragraph linking your findings, limitations, and recommended next step.</p>
-          <p><strong>Example sentence:</strong> "Overall, the analysis supports the recommendation because it addresses cost, user impact, and implementation risk."</p>
-        </article>
-      </section>
-
-      <section class="report-panel" data-report-panel="checklist">
-        <article class="report-card checklist-report-card">
-          <div class="checklist-heading">
-            <div>
-              <h2>Submission Checklist</h2>
-              <p>6 of 8 items complete</p>
-            </div>
-            <strong>75% <span>complete</span></strong>
-          </div>
-
-          <div class="checklist-progress">
-            <span style="width: 75%;"></span>
-          </div>
-
-          <ul class="submission-checklist">
-            <li class="done"><span>✓</span>Assignment draft uploaded</li>
-            <li class="done"><span>✓</span>Rubric criteria checked</li>
-            <li class="done"><span>✓</span>Introduction clearly explains purpose</li>
-            <li class="done"><span>✓</span>Evidence added to support points</li>
-            <li class="todo"><span></span>Missing rubric criteria addressed</li>
-            <li class="done"><span>✓</span>Formatting reviewed</li>
-            <li class="done"><span>✓</span>References checked</li>
-            <li class="todo"><span></span>Final proofreading completed</li>
-          </ul>
-
-          <button class="btn btn-primary checklist-download-button" type="button" data-download-checklist>Download Checklist</button>
-        </article>
-      </section>
+      <% } %>
     </section>
   </main>
 
