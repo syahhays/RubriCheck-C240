@@ -1,8 +1,27 @@
 const express = require('express');
 const { GEMINI_API_KEY, MAX_FOLLOW_UP_CHARS } = require('../config/appConfig');
 const messages = require('../constants/messages');
+const { embedText } = require('../services/ollamaEmbeddingService');
+const { searchChunks } = require('../services/chromaService');
 const { generateGeminiFollowUp } = require('../services/geminiService');
 const { getReview } = require('../services/reviewStore');
+
+const FOLLOW_UP_MATCH_COUNT = 8;
+
+async function retrieveFollowUpContext(submissionId, question, fallbackDocuments) {
+  const questionEmbedding = await embedText(question);
+  const matches = await searchChunks(questionEmbedding, null, submissionId, FOLLOW_UP_MATCH_COUNT);
+
+  if (matches.length === 0) {
+    return fallbackDocuments;
+  }
+
+  return matches.map((match, index) => ({
+    label: `Retrieved ${match.metadata.documentType} Chunk ${index + 1}`,
+    fileName: match.metadata.fileName,
+    text: match.text
+  }));
+}
 
 const router = express.Router();
 
@@ -32,7 +51,8 @@ router.post('/check-assignment/follow-up', async (req, res) => {
       return res.status(400).json({ error: messages.followUpQuestionTooLong });
     }
 
-    const answer = await generateGeminiFollowUp(review, question);
+    const groundedChunks = await retrieveFollowUpContext(reviewId, question, review.documents);
+    const answer = await generateGeminiFollowUp(review, question, groundedChunks);
     res.json({ answer });
   } catch (error) {
     console.error('Gemini follow-up failed:', error);

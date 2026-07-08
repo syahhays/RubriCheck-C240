@@ -1,4 +1,5 @@
-﻿const express = require('express');
+﻿const crypto = require('crypto');
+const express = require('express');
 const { GEMINI_API_KEY } = require('../config/appConfig');
 const messages = require('../constants/messages');
 const { upload, requiredUploadFields } = require('../middleware/upload');
@@ -114,7 +115,7 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
       { label: 'Student Assignment Draft', file: studentDraft }
     ]);
 
-    const submissionId = Date.now().toString();
+    const submissionId = crypto.randomUUID();
     const chunks = reviewDocuments.flatMap((document) =>
       chunkDocument(document.text, document.label, document.fileName, submissionId)
     );
@@ -131,7 +132,7 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
     console.log(`Retrieved ${relevantChunks.length} chunks from ChromaDB for Gemini feedback`);
 
     const feedback = await generateGeminiFeedback(documentsForFeedback);
-    const reviewId = createReview(feedback.report, reviewDocuments, feedback.summary, studentInfo);
+    const reviewId = createReview(submissionId, feedback.report, reviewDocuments, feedback.summary, studentInfo);
 
     res.redirect(`/check-assignment/${reviewId}`);
   } catch (error) {

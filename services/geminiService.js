@@ -175,9 +175,9 @@ async function generateGeminiFeedback(documents) {
   return parseFeedbackResponse(text);
 }
 
-async function generateGeminiFollowUp(review, question) {
+async function generateGeminiFollowUp(review, question, groundedChunks) {
   const text = await generateContent([
-    ...buildDocumentParts(review.documents),
+    ...buildDocumentParts(groundedChunks),
     { text: `Generated Feedback Report:\n${review.report}` },
     { text: `Student Follow-up Question:\n${question}` },
     { text: buildFollowUpPrompt() }

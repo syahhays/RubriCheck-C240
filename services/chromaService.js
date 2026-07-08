@@ -1,16 +1,13 @@
 // services/chromaService.js
 
 const { ChromaClient } = require('chromadb');
+const { CHROMA_HOST, CHROMA_PORT, CHROMA_COLLECTION } = require('../config/appConfig');
 
-const client = new ChromaClient({
-  path: process.env.CHROMA_URL || 'http://localhost:8000'
-});
-
-const COLLECTION_NAME = process.env.CHROMA_COLLECTION || 'rubricheck_documents';
+const client = new ChromaClient({ host: CHROMA_HOST, port: CHROMA_PORT });
 
 async function getCollection() {
   return client.getOrCreateCollection({
-    name: COLLECTION_NAME,
+    name: CHROMA_COLLECTION,
     embeddingFunction: null
   });
 }
@@ -55,7 +52,13 @@ async function searchChunks(queryEmbedding, documentType, submissionId, limit = 
   }));
 }
 
+async function deleteSubmission(submissionId) {
+  const collection = await getCollection();
+  await collection.delete({ where: { submissionId } });
+}
+
 module.exports = {
   storeChunks,
-  searchChunks
+  searchChunks,
+  deleteSubmission
 };

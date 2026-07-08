@@ -1,12 +1,10 @@
-const crypto = require('crypto');
 const { REVIEW_TTL_MS } = require('../config/appConfig');
+const { deleteSubmission } = require('./chromaService');
 
 const reviews = new Map();
 let latestReviewId = null;
 
-function createReview(report, documents, summary = null, studentInfo = {}) {
-  const reviewId = crypto.randomUUID();
-
+function createReview(reviewId, report, documents, summary = null, studentInfo = {}) {
   reviews.set(reviewId, {
     createdAt: Date.now(),
     report,
@@ -30,6 +28,9 @@ function getReview(reviewId) {
 
   if (Date.now() - review.createdAt > REVIEW_TTL_MS) {
     reviews.delete(reviewId);
+    deleteSubmission(reviewId).catch((err) => {
+      console.warn('Failed to clean up Chroma vectors for expired review', reviewId, err.message);
+    });
     return null;
   }
 
@@ -42,6 +43,9 @@ function cleanupExpiredReviews() {
   for (const [reviewId, review] of reviews.entries()) {
     if (now - review.createdAt > REVIEW_TTL_MS) {
       reviews.delete(reviewId);
+      deleteSubmission(reviewId).catch((err) => {
+        console.warn('Failed to clean up Chroma vectors for expired review', reviewId, err.message);
+      });
 
       if (latestReviewId === reviewId) {
         latestReviewId = null;

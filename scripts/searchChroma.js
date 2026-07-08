@@ -1,16 +1,15 @@
 require('dotenv').config();
 
 const { ChromaClient } = require('chromadb');
+const { CHROMA_HOST, CHROMA_PORT, CHROMA_COLLECTION } = require('../config/appConfig');
 const { embedText } = require('../services/ollamaEmbeddingService');
 const { searchChunks } = require('../services/chromaService');
 
 async function getLatestSubmissionId() {
-  const client = new ChromaClient({
-    path: process.env.CHROMA_URL || 'http://127.0.0.1:8000'
-  });
+  const client = new ChromaClient({ host: CHROMA_HOST, port: CHROMA_PORT });
 
   const collection = await client.getCollection({
-    name: process.env.CHROMA_COLLECTION || 'rubricheck_documents',
+    name: CHROMA_COLLECTION,
     embeddingFunction: null
   });
 
