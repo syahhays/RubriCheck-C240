@@ -228,7 +228,7 @@
             </div>
 
             <div class="reminder-action-stack">
-              <a class="btn btn-success reminder-enable-button" href="/reminder"><%- icons.send %> Enable Telegram Reminder</a>
+              <a class="btn btn-success reminder-enable-button" href="<%= generatedReviewId ? `/reminder?reviewId=${encodeURIComponent(generatedReviewId)}` : '/reminder' %>"><%- icons.send %> Enable Telegram Reminder</a>
               <p class="reminder-privacy-note"><%- icons.lock %> Your information is secure and will only be used for reminders.</p>
             </div>
           </div>

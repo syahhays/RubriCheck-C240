@@ -1,4 +1,5 @@
 const express = require('express');
+const { getLatestReview, getReview } = require('../services/reviewStore');
 
 const router = express.Router();
 
@@ -29,8 +30,25 @@ router.get('/questions', (req, res) => {
   res.render('questions', { feedbackHref });
 });
 
+function getReminderReview(req) {
+  const reviewId = typeof req.query.reviewId === 'string' ? req.query.reviewId : '';
+
+  if (reviewId) {
+    const review = getReview(reviewId);
+    return review ? { reviewId, review } : null;
+  }
+
+  return getLatestReview();
+}
+
 router.get('/reminder', (req, res) => {
-  res.render('reminder');
+  const latest = getReminderReview(req);
+
+  res.render('reminder', {
+    reviewId: latest ? latest.reviewId : null,
+    studentInfo: latest ? latest.review.studentInfo : null,
+    summary: latest ? latest.review.summary : null
+  });
 });
 
 module.exports = router;
