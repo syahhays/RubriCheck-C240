@@ -4,12 +4,14 @@ const { REVIEW_TTL_MS } = require('../config/appConfig');
 const reviews = new Map();
 let latestReviewId = null;
 
-function createReview(report, documents) {
+function createReview(report, documents, summary = null, studentInfo = {}) {
   const reviewId = crypto.randomUUID();
 
   reviews.set(reviewId, {
     createdAt: Date.now(),
     report,
+    summary,
+    studentInfo,
     documents: documents.map(({ label, fileName, text }) => ({ label, fileName, text }))
   });
 

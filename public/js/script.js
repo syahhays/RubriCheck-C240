@@ -82,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const followUpForm = document.querySelector("[data-follow-up-form]");
   const followUpSubmit = document.querySelector("[data-follow-up-submit]");
   const followUpAnswer = document.querySelector("[data-follow-up-answer]");
+  const followUpSampleAnswer = document.querySelector(".sample-answer");
   const followUpError = document.querySelector("[data-follow-up-error]");
   const reminderForm = document.querySelector("[data-reminder-form]");
   const reminderSuccess = document.querySelector("[data-reminder-success]");
@@ -456,6 +457,10 @@ document.addEventListener("DOMContentLoaded", () => {
       followUpAnswer.textContent = isError ? "" : message;
       followUpAnswer.classList.toggle("hidden", isError || !message);
     }
+
+    if (followUpSampleAnswer) {
+      followUpSampleAnswer.classList.toggle("hidden", !isError && Boolean(message));
+    }
   }
 
   if (followUpForm) {
@@ -465,6 +470,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData(followUpForm);
       const reviewId = String(formData.get("reviewId") || "");
       const question = String(formData.get("question") || "").trim();
+      const defaultSubmitText = followUpSubmit ? followUpSubmit.textContent : "";
 
       if (!question) {
         showFollowUpMessage("error", "Please enter a follow-up question.");
@@ -498,7 +504,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } finally {
         if (followUpSubmit) {
           followUpSubmit.disabled = false;
-          followUpSubmit.textContent = "Ask RubriCheck AI";
+          followUpSubmit.textContent = defaultSubmitText || "Send";
         }
       }
     });

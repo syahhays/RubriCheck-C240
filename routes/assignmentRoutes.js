@@ -20,9 +20,31 @@ function getReviewFiles(reviewDocuments) {
   };
 }
 
+function getStudentInfo(body) {
+  return {
+    studentName: typeof body.studentName === 'string' ? body.studentName.trim() : '',
+    moduleCode: typeof body.moduleCode === 'string' ? body.moduleCode.trim() : '',
+    assignmentName: typeof body.assignmentName === 'string' ? body.assignmentName.trim() : '',
+    deadline: typeof body.deadline === 'string' ? body.deadline.trim() : '',
+    telegramChatId: typeof body.telegramChatId === 'string' ? body.telegramChatId.trim() : ''
+  };
+}
+
+function hasRequiredStudentInfo(studentInfo) {
+  return Boolean(
+    studentInfo.studentName
+    && studentInfo.moduleCode
+    && studentInfo.assignmentName
+    && studentInfo.deadline
+    && studentInfo.telegramChatId
+  );
+}
+
 function renderStoredReview(res, reviewId, review) {
   return res.render('feedback', {
     report: review.report,
+    summary: review.summary,
+    studentInfo: review.studentInfo,
     reviewId,
     files: getReviewFiles(review.documents)
   });
@@ -32,7 +54,7 @@ router.get('/check-assignment', (req, res) => {
   const latest = getLatestReview();
 
   if (!latest) {
-    return res.render('feedback', { report: null, files: null, reviewId: null });
+    return res.render('feedback', { report: null, summary: null, studentInfo: null, files: null, reviewId: null });
   }
 
   return renderStoredReview(res, latest.reviewId, latest.review);
@@ -42,7 +64,7 @@ router.get('/check-assignment/:reviewId', (req, res) => {
   const review = getReview(req.params.reviewId);
 
   if (!review) {
-    return res.render('feedback', { report: null, files: null, reviewId: null });
+    return res.render('feedback', { report: null, summary: null, studentInfo: null, files: null, reviewId: null });
   }
 
   return renderStoredReview(res, req.params.reviewId, review);
@@ -57,9 +79,16 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
     }
 
     const files = req.files || {};
+    const studentInfo = getStudentInfo(req.body || {});
     const assignmentBrief = getUploadedFile(files, 'assignmentBrief');
     const markingRubric = getUploadedFile(files, 'markingRubric');
     const studentDraft = getUploadedFile(files, 'studentDraft');
+
+    if (!hasRequiredStudentInfo(studentInfo)) {
+      return res.status(400).render('upload', {
+        error: 'Please complete the student information before checking the assignment.'
+      });
+    }
 
     if (!assignmentBrief || !markingRubric || !studentDraft) {
       return res.status(400).render('upload', {
@@ -72,8 +101,8 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
       { label: 'Marking Rubric', file: markingRubric },
       { label: 'Student Assignment Draft', file: studentDraft }
     ]);
-    const report = await generateGeminiFeedback(reviewDocuments);
-    const reviewId = createReview(report, reviewDocuments);
+    const feedback = await generateGeminiFeedback(reviewDocuments);
+    const reviewId = createReview(feedback.report, reviewDocuments, feedback.summary, studentInfo);
 
     res.redirect(`/check-assignment/${reviewId}`);
   } catch (error) {
