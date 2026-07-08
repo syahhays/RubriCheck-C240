@@ -6,10 +6,22 @@ const { prepareReviewDocuments } = require('../services/documentService');
 const { generateGeminiFeedback } = require('../services/geminiService');
 const { createReview } = require('../services/reviewStore');
 
+const { chunkDocument } = require('../utils/chunkDocuments');
+const { searchChunks, storeChunks } = require('../services/chromaService');
+const { embedText, embedTexts } = require('../services/ollamaEmbeddingService');
+
 const router = express.Router();
 
 function getUploadedFile(files, fieldName) {
   return files[fieldName] && files[fieldName][0];
+}
+
+function buildRetrievedDocuments(chunks) {
+  return chunks.map((chunk, index) => ({
+    label: `Retrieved ${chunk.metadata.documentType} Chunk ${index + 1}`,
+    fileName: chunk.metadata.fileName,
+    text: chunk.text
+  }));
 }
 
 router.post('/check-assignment', upload.fields(requiredUploadFields), async (req, res) => {
@@ -36,7 +48,24 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
       { label: 'Marking Rubric', file: markingRubric },
       { label: 'Student Assignment Draft', file: studentDraft }
     ]);
-    const report = await generateGeminiFeedback(reviewDocuments);
+
+    const submissionId = Date.now().toString();
+    const chunks = reviewDocuments.flatMap((document) =>
+      chunkDocument(document.text, document.label, document.fileName, submissionId)
+    );
+    const embeddings = await embedTexts(chunks.map((chunk) => chunk.text));
+    await storeChunks(submissionId, chunks, embeddings);
+
+    const reviewQuery = 'Check whether the student draft meets the assignment brief and marking rubric requirements.';
+    const queryEmbedding = await embedText(reviewQuery);
+    const relevantChunks = await searchChunks(queryEmbedding, null, submissionId, 8);
+    const documentsForFeedback = relevantChunks.length > 0
+      ? buildRetrievedDocuments(relevantChunks)
+      : reviewDocuments;
+
+    console.log(`Retrieved ${relevantChunks.length} chunks from ChromaDB for Gemini feedback`);
+
+    const report = await generateGeminiFeedback(documentsForFeedback);
     const reviewId = createReview(report, reviewDocuments);
 
     res.render('feedback', {
