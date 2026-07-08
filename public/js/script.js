@@ -29,80 +29,6 @@ const DEMO_UPLOAD_FILES = {
   }
 };
 
-const DEMO_FEEDBACK = {
-  assignmentTitle: "Business Analytics Report - Q2 2025",
-  readinessScore: 78,
-  status: "Almost Ready",
-  summary: "Your assignment demonstrates solid research and methodology. Key gaps exist in critical evaluation and limitations; addressing these could push your score above 90%.",
-  metrics: [
-    { type: "positive", value: "4", label: "Strengths" },
-    { type: "warning", value: "4", label: "Improvements" },
-    { type: "danger", value: "2", label: "Missing criteria" }
-  ],
-  strengths: [
-    "Clear problem statement with well-defined research objectives in the introduction.",
-    "Strong literature review using recent sources and relevant industry examples.",
-    "Methodology section shows good understanding of quantitative research design.",
-    "Data visualisations are labelled clearly and connected to the findings."
-  ],
-  improvements: [
-    "Explanation depth is uneven in the analysis section and needs clearer reasoning.",
-    "Some claims need stronger evidence from the dataset or cited references.",
-    "Conclusion should connect back to the research limitations and rubric criteria.",
-    "APA 7th citation formatting is inconsistent across several references."
-  ],
-  missingCriteria: [
-    { level: "danger", title: "Critical Evaluation of Alternatives", weight: "20% of total mark", status: "Missing" },
-    { level: "warning", title: "Stakeholder Impact Analysis", weight: "10% of total mark", status: "Partial" },
-    { level: "warning", title: "Limitations & Future Work", weight: "15% of total mark", status: "Partial" },
-    { level: "danger", title: "Professional Formatting (APA 7th)", weight: "5% of total mark", status: "Missing" }
-  ],
-  suggestions: [
-    {
-      title: "Critical Evaluation",
-      priorityClass: "high",
-      priorityLabel: "High Priority",
-      issue: "The report explains your selected solution but does not compare it against alternatives.",
-      improvement: "Add a subsection comparing at least two alternative approaches using cost, feasibility, and impact.",
-      example: "Add a decision matrix showing why your recommended solution is stronger than the alternatives."
-    },
-    {
-      title: "Explanation Depth",
-      priorityClass: "high",
-      priorityLabel: "High Priority",
-      issue: "Some analysis paragraphs describe results without explaining what the results mean.",
-      improvement: "After each key finding, add one sentence explaining the implication for the business problem.",
-      example: "\"This trend suggests that customer retention is affected more by response time than by discount size.\""
-    },
-    {
-      title: "Evidence & Examples",
-      priorityClass: "medium",
-      priorityLabel: "Medium",
-      issue: "Several recommendations are useful but not supported by enough evidence.",
-      improvement: "Link each recommendation to one dataset finding and one academic or industry source.",
-      example: "Add a citation after your claim about automation improving workflow efficiency."
-    },
-    {
-      title: "Conclusion Clarity",
-      priorityClass: "low",
-      priorityLabel: "Low",
-      issue: "The conclusion summarises the topic but does not clearly restate how the rubric requirements were met.",
-      improvement: "End with a concise paragraph linking your findings, limitations, and recommended next step.",
-      example: "\"Overall, the analysis supports the recommendation because it addresses cost, user impact, and implementation risk.\""
-    }
-  ],
-  checklist: [
-    { done: true, text: "Assignment draft uploaded" },
-    { done: true, text: "Rubric criteria checked" },
-    { done: true, text: "Introduction clearly explains purpose" },
-    { done: true, text: "Evidence added to support points" },
-    { done: false, text: "Missing rubric criteria addressed" },
-    { done: true, text: "Formatting reviewed" },
-    { done: true, text: "References checked" },
-    { done: false, text: "Final proofreading completed" }
-  ]
-};
-
 const DEMO_INITIAL_QUESTIONS = [
   { tag: "Analysis", level: "Medium", text: "Why did you choose this approach for your analysis?" },
   { tag: "Rubric", level: "Hard", text: "How does your solution meet the rubric criteria?" },
@@ -140,6 +66,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const authArea = document.querySelector(".auth-area");
   const uploadForm = document.querySelector("[data-upload-form]");
   const uploadCards = document.querySelectorAll("[data-upload-card]");
+  const studentInfoFields = document.querySelectorAll("[data-student-info-required]");
   const loadDemoFilesButton = document.querySelector("[data-load-demo-files]");
   const analyseButton = document.querySelector("[data-analyse-button]");
   const uploadNote = document.querySelector("[data-upload-note]");
@@ -159,22 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const reminderForm = document.querySelector("[data-reminder-form]");
   const reminderSuccess = document.querySelector("[data-reminder-success]");
   const reminderError = document.querySelector("[data-reminder-error]");
-
-  function renderList(container, items) {
-    if (!container) {
-      return;
-    }
-
-    container.innerHTML = items.map((item) => `<li>${item}</li>`).join("");
-  }
-
-  function setText(selector, value) {
-    const element = document.querySelector(selector);
-
-    if (element) {
-      element.textContent = value;
-    }
-  }
 
   function setValue(selector, value) {
     const element = document.querySelector(selector);
@@ -337,20 +248,63 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function updateStudentFieldValidation(showErrors = false) {
+    let allStudentFieldsReady = true;
+
+    studentInfoFields.forEach((field) => {
+      const isEmpty = field.value.trim() === "";
+      const shouldShowError = showErrors || field.dataset.touched === "true";
+      const fieldWrapper = field.closest(".form-field");
+      const errorMessage = fieldWrapper ? fieldWrapper.querySelector("[data-field-error]") : null;
+
+      if (isEmpty) {
+        allStudentFieldsReady = false;
+      }
+
+      field.classList.toggle("has-error", isEmpty && shouldShowError);
+
+      if (errorMessage) {
+        errorMessage.classList.toggle("hidden", !(isEmpty && shouldShowError));
+      }
+    });
+
+    return allStudentFieldsReady;
+  }
+
   function updateAnalyseButton() {
     if (!analyseButton || uploadCards.length === 0) {
       return;
     }
 
     const allFilesReady = Array.from(uploadCards).every((card) => card.dataset.hasFile === "true");
-    analyseButton.disabled = !allFilesReady;
+    const allStudentFieldsReady = updateStudentFieldValidation(false);
+    analyseButton.disabled = !(allStudentFieldsReady && allFilesReady);
 
     if (uploadNote) {
-      uploadNote.textContent = allFilesReady
-        ? "All three files are ready for AI analysis."
-        : "All three files are required before AI analysis can begin.";
+      if (!allStudentFieldsReady && !allFilesReady) {
+        uploadNote.textContent = "Student information and all three files are required before AI analysis can begin.";
+      } else if (!allStudentFieldsReady) {
+        uploadNote.textContent = "Please complete the student information before AI analysis can begin.";
+      } else if (!allFilesReady) {
+        uploadNote.textContent = "All three files are required before AI analysis can begin.";
+      } else {
+        uploadNote.textContent = "Student information and all three files are ready for AI analysis.";
+      }
     }
   }
+
+  studentInfoFields.forEach((field) => {
+    field.addEventListener("input", () => {
+      updateStudentFieldValidation(false);
+      updateAnalyseButton();
+    });
+
+    field.addEventListener("blur", () => {
+      field.dataset.touched = "true";
+      updateStudentFieldValidation(false);
+      updateAnalyseButton();
+    });
+  });
 
   uploadCards.forEach((card) => {
     const fileInput = card.querySelector("[data-file-input]");
@@ -409,8 +363,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (uploadForm) {
     uploadForm.addEventListener("submit", (event) => {
       const allFilesReady = Object.values(frontendState.selectedFiles).every(Boolean);
+      const allStudentFieldsReady = updateStudentFieldValidation(true);
 
-      if (!allFilesReady) {
+      if (!allStudentFieldsReady || !allFilesReady) {
         event.preventDefault();
         updateAnalyseButton();
         return;
@@ -424,7 +379,11 @@ document.addEventListener("DOMContentLoaded", () => {
   updateAnalyseButton();
 
   if (uploadForm && analyseButton) {
-    uploadForm.addEventListener('submit', () => {
+    uploadForm.addEventListener('submit', (event) => {
+      if (event.defaultPrevented || analyseButton.disabled) {
+        return;
+      }
+
       analyseButton.disabled = true;
       analyseButton.textContent = 'Checking your assignment...';
 
@@ -459,77 +418,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.setTimeout(() => {
       window.clearInterval(progressTimer);
-      window.location.href = "/feedback";
+      window.location.href = "/check-assignment";
     }, 4000);
-  }
-
-  function renderFeedbackReport(feedback) {
-    setText("[data-feedback-kicker]", feedback.assignmentTitle);
-    setText("[data-feedback-score]", String(feedback.readinessScore));
-    setText("[data-feedback-heading]", `Overall Readiness: ${feedback.readinessScore}%`);
-    setText("[data-feedback-status]", feedback.status);
-    setText("[data-feedback-summary]", feedback.summary);
-
-    const metricContainer = document.querySelector("[data-feedback-metrics]");
-    const missingContainer = document.querySelector("[data-missing-criteria]");
-    const suggestionsContainer = document.querySelector("[data-suggestions-list]");
-    const checklistContainer = document.querySelector("[data-feedback-checklist]");
-    const checklistProgress = document.querySelector("[data-checklist-progress]");
-    const completedItems = feedback.checklist.filter((item) => item.done).length;
-    const checklistPercent = Math.round((completedItems / feedback.checklist.length) * 100);
-
-    if (metricContainer) {
-      metricContainer.innerHTML = feedback.metrics.map((metric) => `
-        <div class="metric-card ${metric.type}">
-          <strong>${metric.value}</strong>
-          <span>${metric.label}</span>
-        </div>
-      `).join("");
-    }
-
-    renderList(document.querySelector("[data-strength-list]"), feedback.strengths);
-    renderList(document.querySelector("[data-improvement-list]"), feedback.improvements);
-
-    if (missingContainer) {
-      missingContainer.innerHTML = feedback.missingCriteria.map((item) => `
-        <div class="missing-item ${item.level}">
-          <strong>${item.title}</strong>
-          <span>${item.weight}</span>
-          <em>${item.status}</em>
-        </div>
-      `).join("");
-    }
-
-    if (suggestionsContainer) {
-      suggestionsContainer.innerHTML = feedback.suggestions.map((suggestion) => `
-        <article class="suggestion-card">
-          <div>
-            <h2>${suggestion.title}</h2>
-            <span class="priority ${suggestion.priorityClass}">${suggestion.priorityLabel}</span>
-          </div>
-          <p><strong>Issue found:</strong> ${suggestion.issue}</p>
-          <p><strong>Suggested improvement:</strong> ${suggestion.improvement}</p>
-          <p><strong>Example action:</strong> ${suggestion.example}</p>
-        </article>
-      `).join("");
-    }
-
-    setText("[data-checklist-summary]", `${completedItems} of ${feedback.checklist.length} items complete`);
-    setText("[data-checklist-percent]", `${checklistPercent}%`);
-
-    if (checklistProgress) {
-      checklistProgress.style.width = `${checklistPercent}%`;
-    }
-
-    if (checklistContainer) {
-      checklistContainer.innerHTML = feedback.checklist.map((item) => `
-        <li class="${item.done ? "done" : "todo"}"><span>${item.done ? "&#10003;" : ""}</span>${item.text}</li>
-      `).join("");
-    }
-  }
-
-  if (document.querySelector("[data-feedback-score]")) {
-    renderFeedbackReport(DEMO_FEEDBACK);
   }
 
   reportTabs.forEach((tab) => {
@@ -589,7 +479,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showFollowUpMessage("answer", "Checking the uploaded documents and feedback report...");
 
       try {
-        const response = await fetch("/feedback/follow-up", {
+        const response = await fetch("/check-assignment/follow-up", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"

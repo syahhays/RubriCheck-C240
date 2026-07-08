@@ -61,7 +61,7 @@
           <p>Practise possible presentation and viva questions generated from your assignment review.</p>
         </div>
 
-        <a class="btn btn-secondary" href="/feedback">Back to Feedback Report</a>
+        <a class="btn btn-secondary" href="<%= typeof feedbackHref === 'undefined' ? '/check-assignment' : feedbackHref %>">Back to Feedback Report</a>
       </div>
 
       <section class="question-summary-card">

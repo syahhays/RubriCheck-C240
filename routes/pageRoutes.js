@@ -18,16 +18,15 @@ router.get('/analysing', (req, res) => {
   res.render('analysing');
 });
 
-router.get('/feedback', (req, res) => {
-  res.render('feedback', { report: null, files: null, reviewId: null });
-});
-
 router.get('/checklist', (req, res) => {
   res.render('checklist');
 });
 
 router.get('/questions', (req, res) => {
-  res.render('questions');
+  const reviewId = typeof req.query.reviewId === 'string' ? req.query.reviewId : '';
+  const feedbackHref = reviewId ? `/check-assignment/${encodeURIComponent(reviewId)}` : '/check-assignment';
+
+  res.render('questions', { feedbackHref });
 });
 
 router.get('/reminder', (req, res) => {

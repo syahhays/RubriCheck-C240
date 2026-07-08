@@ -1081,6 +1081,45 @@ a {
   gap: 32px;
 }
 
+.student-info-card {
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: var(--shadow-sm);
+}
+
+.student-info-card h2,
+.upload-documents-section h2 {
+  margin: 0 0 20px;
+  color: var(--ink);
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.student-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.field-error {
+  margin-top: -2px;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.form-field input.has-error {
+  border-color: #fca5a5;
+  background: #fffafa;
+}
+
+.form-field input.has-error:focus {
+  outline-color: rgba(220, 38, 38, 0.14);
+  border-color: #dc2626;
+}
+
 .upload-toolbar {
   display: flex;
   justify-content: center;
@@ -2463,6 +2502,7 @@ a {
   .process-grid,
   .summary-grid,
   .readiness-layout,
+  .student-info-grid,
   .upload-card-grid,
   .uploaded-file-summary,
   .feedback-summary-card,
