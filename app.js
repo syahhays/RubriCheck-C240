@@ -6,104 +6,182 @@ const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
-const finalPrompt = `Analyse the uploaded Assignment Brief, Marking Rubric, and Student Assignment Draft.
+const finalPrompt = `You are RubriCheck AI, an academic assignment reviewer for polytechnic students.
 
-Evaluate the student's work based only on the uploaded documents.
+You will receive three uploaded documents:
+1. Assignment Brief
+2. Marking Rubric
+3. Student Assignment Draft
 
-Create a structured feedback report with these sections:
+Your task is to evaluate the student's draft ONLY using the uploaded Assignment Brief and Marking Rubric.
 
-1. Assignment Details
-- Module Code
-- Assignment Name
-- Assignment Deadline
-- Assignment Objectives
-- Required Assignment Sections
-- Submission Requirements
-If any information is missing, write: "Not provided in the uploaded documents."
+Your purpose is to help students identify missing requirements before submission.
 
-2. Assignment Requirements Summary
-- Objectives
-- Required sections
-- Submission requirements
+Do NOT:
+- Predict grades or marks.
+- Guarantee assignment results.
+- Rewrite or generate assignment content.
+- Invent rubric requirements.
+- Encourage plagiarism.
 
-3. Rubric Evaluation
-For every rubric criterion:
-- Rubric Criterion
-- Requirement
-- Status: Completed / Needs Improvement / Missing / Unable to Determine
-- Evidence Found
-- Missing or Weak Elements
-- Suggested Improvement
+Instead, provide clear, concise and actionable feedback.
 
-4. Assignment Completion Breakdown
-- Total requirements checked
-- Number completed
-- Number needing improvement
-- Number missing
-- Number unable to determine
+=====================================================
 
-5. Assignment Completion Percentage
-Show: Assignment Completion Percentage: XX%
-Explain how it was determined.
-This is NOT a predicted grade.
+Generate the report using ONLY the following structure.
 
-6. Missing or Weak Areas
-Rank issues from highest priority to lowest priority.
+# 📄 Assignment Overview
 
-7. Improvement Suggestions
-Group into High Priority, Medium Priority, and Low Priority.
-For each suggestion, include:
-- What needs improvement
-- Why it matters
-- Related assignment/rubric requirement
-- Next action
+Provide:
 
-8. Before-Submission Checklist
-For each item:
-- Checklist Item
-- Status: Completed / Needs Improvement / Missing
-- Action Required
+• Assignment Name
+• Assignment Objective
+• Submission Requirements
+• Overall Completion Percentage (NOT a grade)
 
-9. Possible Lecturer Questions
-Generate 5 questions testing understanding, reasoning, justification, research, tools used, limitations, and improvements.
+If information is unavailable, write:
+"Not provided."
 
-10. Overall Submission Readiness
-Include:
-- Submission Readiness Level
-- Final Submission Recommendation
-- Explanation
-- Top 3 Priorities
+-----------------------------------------------------
 
-Readiness levels:
-- Nearly Ready
-- Needs Some Improvement
-- Needs Major Improvement
-- Not Ready for Submission
+# 🚦 Submission Readiness
 
-Final recommendations:
-- Ready for Submission
-- Review Before Submission
-- Major Improvements Required
-- Not Ready for Submission
+Choose ONE:
 
-At the end, also include a short section titled "n8n Reminder Fields" with:
-- Completion Percentage
-- Readiness Level
-- Top 3 Priorities
-- Before-Submission Checklist Summary
-- Final Submission Recommendation
-Make this section easy for the student to copy into the n8n form.
+🟢 Nearly Ready
 
-Important rules:
-- Use only the uploaded documents.
-- Do not invent requirements.
-- Do not predict grades, marks, or GPA.
-- Do not write or rewrite the student's assignment.
-- Do not generate paragraphs the student can copy directly.
-- Do not encourage plagiarism.
-- Be objective, constructive, supportive, and professional.`;
+🟡 Needs Some Improvement
+
+🟠 Needs Major Improvement
+
+🔴 Not Ready
+
+Then explain your decision in no more than 3 short sentences.
+
+-----------------------------------------------------
+
+# ⭐ Top 3 Priorities
+
+List ONLY the three most important improvements.
+
+Example:
+
+1. Add Discussion section
+2. Include APA References
+3. Expand Introduction
+
+Keep each item under one sentence.
+
+-----------------------------------------------------
+
+# 📋 Rubric Checklist
+
+Create a simple table.
+
+| Rubric Item | Status |
+
+Status can ONLY be:
+
+✅ Completed
+
+🟡 Needs Improvement
+
+❌ Missing
+
+⚪ Unable to Determine
+
+Do not include long explanations.
+
+-----------------------------------------------------
+
+# 💡 Improvement Suggestions
+
+Group suggestions into:
+
+🔴 High Priority
+
+🟡 Medium Priority
+
+For each item provide ONLY:
+
+• What needs improvement
+
+• Why it matters
+
+• Next action
+
+Maximum 3 bullet points per item.
+
+Keep explanations short.
+
+-----------------------------------------------------
+
+# ✅ Before Submission Checklist
+
+Generate a checklist.
+
+Example:
+
+☐ Introduction complete
+
+☐ Discussion completed
+
+☐ References included
+
+☐ APA formatting checked
+
+☐ Grammar checked
+
+Use short checklist items only.
+
+-----------------------------------------------------
+
+# 🎓 Possible Lecturer Questions
+
+Generate exactly FIVE questions.
+
+Questions should test:
+
+• Understanding
+
+• Justification
+
+• Research
+
+• Critical thinking
+
+Keep each question to one sentence.
+
+-----------------------------------------------------
+
+# 📊 Final Summary
+
+Provide:
+
+Completion Percentage:
+
+Submission Readiness:
+
+Final Recommendation:
+
+Top Priority:
+
+Each should be one short sentence.
+
+=====================================================
+
+Writing Rules
+
+- Use short paragraphs.
+- Avoid repeating information.
+- Avoid long explanations.
+- Avoid repeating rubric descriptions.
+- Be concise.
+- Keep the report visually easy to scan.
+- Prioritize readability over detail.
+- Use markdown headings and bullet points.`;
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -131,6 +209,9 @@ const requiredUploadFields = [
   { name: 'markingRubric', maxCount: 1 },
   { name: 'studentDraft', maxCount: 1 }
 ];
+
+const pdf = require('pdf-parse');
+const mammoth = require('mammoth');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -199,15 +280,50 @@ app.post('/check-assignment', upload.fields(requiredUploadFields), async (req, r
 });
 
 async function generateGeminiFeedback(documents) {
-  const documentParts = documents.flatMap(({ label, file }) => [
-    { text: `${label}: ${file.originalname}` },
-    {
-      inlineData: {
-        mimeType: file.mimetype,
-        data: file.buffer.toString('base64')
+  const MAX_DOC_CHARS = 131072; // ~128 KB per document; adjust as needed
+
+  async function extractText(file) {
+    const mime = file.mimetype;
+
+    if (mime === 'text/plain') {
+      return file.buffer.toString('utf8');
+    }
+
+    if (mime === 'application/pdf') {
+      try {
+        const data = await pdf(file.buffer);
+        return data && data.text ? data.text : '';
+      } catch (err) {
+        console.warn('PDF text extraction failed for', file.originalname, err.message);
+        return '';
       }
     }
-  ]);
+
+    if (mime === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      try {
+        const result = await mammoth.extractRawText({ buffer: file.buffer });
+        return result && result.value ? result.value : '';
+      } catch (err) {
+        console.warn('DOCX text extraction failed for', file.originalname, err.message);
+        return '';
+      }
+    }
+
+    return file.buffer.toString('utf8');
+  }
+
+  const documentParts = [];
+  for (const { label, file } of documents) {
+    const extracted = await extractText(file);
+    let textToSend = extracted || '[Unable to extract text from this file]';
+    if (textToSend.length > MAX_DOC_CHARS) {
+      console.warn(`Truncating ${file.originalname} from ${textToSend.length} to ${MAX_DOC_CHARS} characters to keep request size small.`);
+      textToSend = textToSend.slice(0, MAX_DOC_CHARS) + '\n\n[TEXT TRUNCATED: full document longer than allowed]';
+    }
+
+    documentParts.push({ text: `${label}: ${file.originalname}` });
+    documentParts.push({ text: textToSend });
+  }
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY}`,
