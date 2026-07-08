@@ -54,6 +54,7 @@
 
   <% const generatedReport = typeof report === 'undefined' ? null : report; %>
   <% const uploadedFiles = typeof files === 'undefined' ? null : files; %>
+  <% const generatedReviewId = typeof reviewId === 'undefined' ? null : reviewId; %>
 
   <main class="feedback-page">
     <section class="feedback-shell container">
@@ -103,6 +104,28 @@
         <article class="ai-report-card">
           <pre class="ai-report-text"><%= generatedReport %></pre>
         </article>
+
+        <section class="follow-up-card" aria-labelledby="follow-up-title">
+          <div class="follow-up-heading">
+            <div>
+              <h2 id="follow-up-title">Ask RubriCheck AI a follow-up question</h2>
+              <p>Ask about this feedback report, the uploaded documents, or which improvement to focus on first.</p>
+            </div>
+          </div>
+
+          <form class="follow-up-form" data-follow-up-form>
+            <input type="hidden" name="reviewId" value="<%= generatedReviewId %>">
+            <label for="follow-up-question" class="sr-only">Follow-up question</label>
+            <textarea id="follow-up-question" name="question" rows="4" maxlength="1000" placeholder="What should I fix first?" required data-follow-up-question></textarea>
+            <div class="follow-up-actions">
+              <p class="follow-up-note">Answers are limited to the uploaded documents and this feedback report.</p>
+              <button class="btn btn-primary" type="submit" data-follow-up-submit>Ask RubriCheck AI</button>
+            </div>
+          </form>
+
+          <p class="follow-up-error hidden" data-follow-up-error role="alert"></p>
+          <article class="follow-up-answer hidden" data-follow-up-answer aria-live="polite"></article>
+        </section>
       <% } else { %>
         <section class="feedback-summary-card">
           <div class="score-ring feedback-score-ring">

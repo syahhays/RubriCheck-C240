@@ -152,6 +152,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const regenerateQuestionsButton = document.querySelector("[data-regenerate-questions]");
   const questionList = document.querySelector("[data-question-list]");
   const questionCount = document.querySelector("[data-question-count]");
+  const followUpForm = document.querySelector("[data-follow-up-form]");
+  const followUpSubmit = document.querySelector("[data-follow-up-submit]");
+  const followUpAnswer = document.querySelector("[data-follow-up-answer]");
+  const followUpError = document.querySelector("[data-follow-up-error]");
   const reminderForm = document.querySelector("[data-reminder-form]");
   const reminderSuccess = document.querySelector("[data-reminder-success]");
   const reminderError = document.querySelector("[data-reminder-error]");
@@ -524,7 +528,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  renderFeedbackReport(DEMO_FEEDBACK);
+  if (document.querySelector("[data-feedback-score]")) {
+    renderFeedbackReport(DEMO_FEEDBACK);
+  }
 
   reportTabs.forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -547,6 +553,66 @@ document.addEventListener("DOMContentLoaded", () => {
       window.alert("Checklist download will be available in the full version.");
     });
   });
+
+  function showFollowUpMessage(type, message) {
+    const isError = type === "error";
+
+    if (followUpError) {
+      followUpError.textContent = isError ? message : "";
+      followUpError.classList.toggle("hidden", !isError);
+    }
+
+    if (followUpAnswer) {
+      followUpAnswer.textContent = isError ? "" : message;
+      followUpAnswer.classList.toggle("hidden", isError || !message);
+    }
+  }
+
+  if (followUpForm) {
+    followUpForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const formData = new FormData(followUpForm);
+      const reviewId = String(formData.get("reviewId") || "");
+      const question = String(formData.get("question") || "").trim();
+
+      if (!question) {
+        showFollowUpMessage("error", "Please enter a follow-up question.");
+        return;
+      }
+
+      if (followUpSubmit) {
+        followUpSubmit.disabled = true;
+        followUpSubmit.textContent = "Asking RubriCheck AI...";
+      }
+
+      showFollowUpMessage("answer", "Checking the uploaded documents and feedback report...");
+
+      try {
+        const response = await fetch("/feedback/follow-up", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ reviewId, question })
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to answer the follow-up question. Please try again.");
+        }
+
+        showFollowUpMessage("answer", data.answer || "RubriCheck AI did not return an answer.");
+      } catch (error) {
+        showFollowUpMessage("error", error.message || "Unable to answer the follow-up question. Please try again.");
+      } finally {
+        if (followUpSubmit) {
+          followUpSubmit.disabled = false;
+          followUpSubmit.textContent = "Ask RubriCheck AI";
+        }
+      }
+    });
+  }
 
   function renderQuestions(questions) {
     if (!questionList) {
