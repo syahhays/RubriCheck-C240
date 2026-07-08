@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RubriCheck AI | Submission Reminder</title>
+  <link rel="icon" type="image/png" href="/images/RubriCheck%20Logo.png">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-bar">
+      <a class="brand" href="/" aria-label="RubriCheck AI home">
+        <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+        <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
+      </a>
+
+      <nav class="main-nav" aria-label="Main navigation">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link" href="/dashboard">Dashboard</a>
+        <a class="nav-link" href="/upload">New Review</a>
+      </nav>
+
+      <div class="auth-area" aria-label="Account actions">
+        <button class="login-button" type="button" data-login-open>Log In</button>
+
+        <a class="user-chip hidden" href="/dashboard" aria-label="Open user dashboard" data-user-chip>
+          <span class="user-icon">DS</span>
+          <span>Student</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="modal-overlay hidden" data-login-modal>
+    <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
+      <button class="modal-close" type="button" aria-label="Close login" data-login-close>&times;</button>
+
+      <img class="modal-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+      <h2 id="login-title">Log in to RubriCheck AI</h2>
+      <p>Use the sample login to preview the student experience.</p>
+
+      <form class="login-form">
+        <label for="demo-email">Email</label>
+        <input id="demo-email" type="email" value="student@myrp.edu.sg" readonly>
+
+        <label for="demo-password">Password</label>
+        <input id="demo-password" type="password" value="password" readonly>
+
+        <button class="btn btn-primary" type="button" data-demo-login>Log In</button>
+      </form>
+    </section>
+  </div>
+
+  <main class="reminder-page">
+    <section class="reminder-shell container">
+      <article class="reminder-card">
+        <div class="reminder-header">
+          <div>
+            <p class="dashboard-kicker">Submission Reminder</p>
+            <h1>Rubric Checker AI - Submission Reminder Form</h1>
+            <p>Save your assignment details to receive Telegram reminders before your submission deadline.</p>
+          </div>
+        </div>
+
+        <form class="reminder-form" data-reminder-form>
+          <div class="reminder-grid">
+            <div class="form-field">
+              <label for="student-name">Student Name</label>
+              <input id="student-name" name="studentName" type="text" value="Student Name" required data-reminder-required>
+            </div>
+
+            <div class="form-field">
+              <label for="telegram-chat-id">Telegram Chat ID</label>
+              <input id="telegram-chat-id" name="telegramChatId" type="text" placeholder="Enter your Telegram Chat ID" required data-reminder-required>
+            </div>
+
+            <div class="form-field">
+              <label for="module-code">Module Code</label>
+              <input id="module-code" name="moduleCode" type="text" value="C240" required data-reminder-required>
+            </div>
+
+            <div class="form-field">
+              <label for="assignment-name">Assignment Name</label>
+              <input id="assignment-name" name="assignmentName" type="text" value="Final Assessment" required data-reminder-required>
+            </div>
+
+            <div class="form-field">
+              <label for="deadline">Deadline</label>
+              <input id="deadline" name="deadline" type="datetime-local" required data-reminder-required>
+            </div>
+
+            <div class="form-field">
+              <label for="readiness-score">Readiness Score</label>
+              <input id="readiness-score" name="readinessScore" type="number" min="0" max="100" value="68" required data-reminder-required>
+            </div>
+          </div>
+
+          <div class="reminder-detail-grid">
+            <section class="reminder-list-card">
+              <label for="top-3-priorities">Top 3 Priorities</label>
+              <textarea id="top-3-priorities" name="top3Priorities" rows="5" required data-reminder-required>Add ethical AI explanation
+Improve tool justification
+Complete checklist</textarea>
+            </section>
+
+            <section class="reminder-list-card">
+              <label for="checklist">Before-Submission Checklist</label>
+              <textarea id="checklist" name="checklist" rows="5" required data-reminder-required>Assignment objectives explained
+AI tools justified
+Ethical use included
+Workflow diagram included</textarea>
+            </section>
+          </div>
+
+          <button class="btn btn-primary reminder-save-button" type="submit">Save Reminder</button>
+          <p class="reminder-error-message hidden" data-reminder-error>
+            Please enter your Telegram Chat ID and deadline before saving.
+          </p>
+          <p class="reminder-success-message hidden" data-reminder-success>
+            Reminder form is ready. Add the n8n webhook URL to connect automation.
+          </p>
+        </form>
+      </article>
+    </section>
+  </main>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

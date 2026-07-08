@@ -37,6 +37,10 @@ app.get('/questions', (req, res) => {
   res.render('questions');
 });
 
+app.get('/reminder', (req, res) => {
+  res.render('reminder');
+});
+
 app.listen(PORT, () => {
   console.log(`RubriCheck AI is running at http://localhost:${PORT}`);
 });
