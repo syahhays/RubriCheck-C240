@@ -57,70 +57,93 @@
       <div class="upload-heading">
         <span class="upload-page-icon" aria-hidden="true">UP</span>
         <h1>Upload your documents</h1>
-        <p>Upload your assignment draft and marking rubric. We support PDF and DOCX files.</p>
+        <p>Upload your assignment brief, marking rubric, and student draft. We support PDF, DOCX, and TXT files.</p>
       </div>
 
-      <form class="upload-form" action="/analysing" method="get" data-upload-form>
-        <div class="upload-toolbar">
-          <button class="btn btn-secondary load-demo-button" type="button" data-load-demo-files>Load Demo Files</button>
-        </div>
+      <% const uploadError = typeof error === 'undefined' ? null : error; %>
+      <% if (uploadError) { %>
+        <div class="upload-error" role="alert"><%= uploadError %></div>
+      <% } %>
 
+      <form class="upload-form" action="/check-assignment" method="post" enctype="multipart/form-data" data-upload-form>
         <div class="upload-card-grid">
-          <article class="upload-card" data-upload-card data-file-key="assignment" data-demo-file="Business_Analytics_Report.docx" data-demo-type="Assignment draft uploaded">
-            <label class="upload-drop-zone" for="assignment-draft">
-              <input id="assignment-draft" class="file-input" type="file" accept=".pdf,.docx" aria-label="Upload assignment draft" data-file-input>
+          <article class="upload-card" data-upload-card data-file-key="brief">
+            <label class="upload-drop-zone" for="assignment-brief">
+              <input id="assignment-brief" name="assignmentBrief" class="file-input" type="file" accept=".pdf,.docx,.txt" aria-label="Upload assignment brief" data-file-input required>
               <span class="upload-empty-state">
-                <span class="upload-icon" aria-hidden="true">DOC</span>
-                <strong>Assignment Draft</strong>
-                <span>Drag &amp; drop your assignment or click to browse.</span>
-                <small>Supported formats: PDF, DOCX</small>
+                <span class="upload-icon" aria-hidden="true">BRF</span>
+                <strong>Assignment Brief</strong>
+                <span>Drag &amp; drop your brief or click to browse.</span>
+                <small>Supported formats: PDF, DOCX, TXT</small>
               </span>
             </label>
 
             <div class="uploaded-state">
-              <span class="uploaded-check" aria-hidden="true">✓</span>
+              <span class="uploaded-check" aria-hidden="true">&#10003;</span>
               <div class="uploaded-file-copy">
-                <strong data-file-name>Business_Analytics_Report.docx</strong>
-                <span data-file-type>Assignment draft uploaded</span>
+                <strong data-file-name>Assignment brief</strong>
+                <span data-file-type>Assignment brief uploaded</span>
               </div>
-              <label class="file-action-link" for="assignment-draft">Replace</label>
-              <button class="remove-file-button" type="button" aria-label="Remove assignment draft" data-remove-file>&times;</button>
+              <label class="file-action-link" for="assignment-brief">Replace</label>
+              <button class="remove-file-button" type="button" aria-label="Remove assignment brief" data-remove-file>&times;</button>
             </div>
           </article>
 
-          <article class="upload-card" data-upload-card data-file-key="rubric" data-demo-file="Business_Analytics_Rubric.pdf" data-demo-type="Marking rubric uploaded">
+          <article class="upload-card" data-upload-card data-file-key="rubric">
             <label class="upload-drop-zone" for="marking-rubric">
-              <input id="marking-rubric" class="file-input" type="file" accept=".pdf,.docx" aria-label="Upload marking rubric" data-file-input>
+              <input id="marking-rubric" name="markingRubric" class="file-input" type="file" accept=".pdf,.docx,.txt" aria-label="Upload marking rubric" data-file-input required>
               <span class="upload-empty-state">
                 <span class="upload-icon" aria-hidden="true">RUB</span>
                 <strong>Marking Rubric</strong>
                 <span>Drag &amp; drop your rubric or click to browse.</span>
-                <small>Supported formats: PDF, DOCX</small>
+                <small>Supported formats: PDF, DOCX, TXT</small>
               </span>
             </label>
 
             <div class="uploaded-state">
-              <span class="uploaded-check" aria-hidden="true">✓</span>
+              <span class="uploaded-check" aria-hidden="true">&#10003;</span>
               <div class="uploaded-file-copy">
-                <strong data-file-name>Business_Analytics_Rubric.pdf</strong>
+                <strong data-file-name>Marking rubric</strong>
                 <span data-file-type>Marking rubric uploaded</span>
               </div>
               <label class="file-action-link" for="marking-rubric">Replace</label>
               <button class="remove-file-button" type="button" aria-label="Remove marking rubric" data-remove-file>&times;</button>
             </div>
           </article>
+
+          <article class="upload-card" data-upload-card data-file-key="draft">
+            <label class="upload-drop-zone" for="assignment-draft">
+              <input id="assignment-draft" name="studentDraft" class="file-input" type="file" accept=".pdf,.docx,.txt" aria-label="Upload student draft" data-file-input required>
+              <span class="upload-empty-state">
+                <span class="upload-icon" aria-hidden="true">DOC</span>
+                <strong>Student Draft</strong>
+                <span>Drag &amp; drop your draft or click to browse.</span>
+                <small>Supported formats: PDF, DOCX, TXT</small>
+              </span>
+            </label>
+
+            <div class="uploaded-state">
+              <span class="uploaded-check" aria-hidden="true">&#10003;</span>
+              <div class="uploaded-file-copy">
+                <strong data-file-name>Student draft</strong>
+                <span data-file-type>Student draft uploaded</span>
+              </div>
+              <label class="file-action-link" for="assignment-draft">Replace</label>
+              <button class="remove-file-button" type="button" aria-label="Remove student draft" data-remove-file>&times;</button>
+            </div>
+          </article>
         </div>
 
         <div class="upload-actions">
-          <button class="btn btn-primary analyse-button" type="submit" data-analyse-button disabled>Analyse with AI</button>
-          <p data-upload-note>Both files are required before AI analysis can begin.</p>
+          <button class="btn btn-primary analyse-button" type="submit" data-analyse-button disabled>Check My Assignment</button>
+          <p data-upload-note>All three files are required before AI analysis can begin.</p>
         </div>
       </form>
 
-      <div class="upload-trust-row" aria-label="Upload demo notes">
-        <span>Files not stored</span>
-        <span>Results in &lt; 60s</span>
-        <span>Rubric-accurate</span>
+      <div class="upload-trust-row" aria-label="Upload notes">
+        <span>Files processed server-side</span>
+        <span>API key protected</span>
+        <span>Rubric-focused feedback</span>
       </div>
     </section>
   </main>

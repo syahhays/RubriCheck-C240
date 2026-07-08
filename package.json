@@ -2,8 +2,9 @@
   "name": "rubricheck-c240",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,7 +20,9 @@
   },
   "homepage": "https://github.com/syahhays/RubriCheck-C240#readme",
   "dependencies": {
+    "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "multer": "^2.2.0"
   }
 }

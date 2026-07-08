@@ -15,13 +15,17 @@ const DEMO_USER = {
 };
 
 const DEMO_UPLOAD_FILES = {
-  assignment: {
-    fileName: "Business_Analytics_Report.docx",
-    fileType: "Assignment draft uploaded"
+  brief: {
+    fileName: "Business_Analytics_Brief.pdf",
+    fileType: "Assignment brief uploaded"
   },
   rubric: {
     fileName: "Business_Analytics_Rubric.pdf",
     fileType: "Marking rubric uploaded"
+  },
+  draft: {
+    fileName: "Business_Analytics_Report.docx",
+    fileType: "Student draft uploaded"
   }
 };
 
@@ -119,8 +123,9 @@ const DEMO_REGENERATED_QUESTIONS = [
 
 const frontendState = {
   selectedFiles: {
-    assignment: null,
-    rubric: null
+    brief: null,
+    rubric: null,
+    draft: null
   }
 };
 
@@ -338,8 +343,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (uploadNote) {
       uploadNote.textContent = allFilesReady
-        ? "Both files are ready for AI analysis."
-        : "Both files are required before AI analysis can begin.";
+        ? "All three files are ready for AI analysis."
+        : "All three files are required before AI analysis can begin.";
     }
   }
 
@@ -358,9 +363,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const selectedFile = fileInput.files[0];
         const fileExtension = selectedFile.name.split(".").pop().toUpperCase();
-        const fileType = fileKey === "rubric"
-          ? `Marking rubric selected - ${fileExtension}`
-          : `Assignment draft selected - ${fileExtension}`;
+        let fileLabel = "Student draft uploaded";
+
+        if (fileKey === "rubric") {
+          fileLabel = "Marking rubric uploaded";
+        }
+
+        if (fileKey === "brief") {
+          fileLabel = "Assignment brief uploaded";
+        }
+
+        const fileType = `${fileLabel} - ${fileExtension}`;
 
         setCardFile(card, selectedFile.name, fileType);
         updateAnalyseButton();
@@ -405,6 +418,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   updateAnalyseButton();
+
+  if (uploadForm && analyseButton) {
+    uploadForm.addEventListener('submit', () => {
+      analyseButton.disabled = true;
+      analyseButton.textContent = 'Checking your assignment...';
+
+      if (uploadNote) {
+        uploadNote.textContent = 'Please wait while Gemini analyses the uploaded documents.';
+      }
+    });
+  }
 
   if (analysisProgress && analysisPercent && analysisSteps.length > 0) {
     // Future AI integration point: call AI_ANALYSIS_API_URL here when the backend exists.
