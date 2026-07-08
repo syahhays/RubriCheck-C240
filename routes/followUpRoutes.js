@@ -6,7 +6,7 @@ const { getReview } = require('../services/reviewStore');
 
 const router = express.Router();
 
-router.post('/feedback/follow-up', async (req, res) => {
+router.post('/check-assignment/follow-up', async (req, res) => {
   try {
     if (!GEMINI_API_KEY) {
       return res.status(500).json({

@@ -52,39 +52,236 @@
     </section>
   </div>
 
-  <% const generatedReport = typeof report === 'undefined' ? null : report; %>
-  <% const uploadedFiles = typeof files === 'undefined' ? null : files; %>
-  <% const generatedReviewId = typeof reviewId === 'undefined' ? null : reviewId; %>
+  <%
+    const generatedReport = typeof report === 'undefined' ? null : report;
+    const generatedSummary = typeof summary === 'undefined' || !summary ? {} : summary;
+    const uploadedFiles = typeof files === 'undefined' ? null : files;
+    const generatedReviewId = typeof reviewId === 'undefined' ? null : reviewId;
+    const student = typeof studentInfo === 'undefined' || !studentInfo ? {} : studentInfo;
+
+    function asPercent(value, fallback) {
+      const numberValue = Number(value);
+      return Number.isFinite(numberValue) ? Math.max(0, Math.min(100, Math.round(numberValue))) : fallback;
+    }
+
+    function listOrFallback(value, fallback) {
+      return Array.isArray(value) && value.length > 0 ? value : fallback;
+    }
+
+    function formatDeadline(value) {
+      if (!value) {
+        return 'Not provided';
+      }
+
+      const date = new Date(`${value}T23:59:00`);
+
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+
+      return date.toLocaleString('en-SG', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+
+    const completionPercent = asPercent(generatedSummary.completionPercentage, 0);
+    const readinessScore = asPercent(generatedSummary.readinessScore, completionPercent);
+    const readinessLevel = generatedSummary.readinessLevel || 'Needs Review';
+    const finalRecommendation = generatedSummary.finalRecommendation || 'Review Before Submission';
+    const topPriorities = listOrFallback(generatedSummary.topPriorities, ['Review the full feedback report', 'Fix missing rubric requirements', 'Check evidence before submission']);
+    const checklist = listOrFallback(generatedSummary.checklist, ['Review all rubric requirements', 'Check citations and references', 'Proofread before submission']);
+    const missingWeakAreas = listOrFallback(generatedSummary.missingWeakAreas, ['Review the full feedback report for weak areas']);
+    const reportText = generatedSummary.fullFeedback || generatedReport;
+    const icons = {
+      check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>',
+      sparkles: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3Z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8L19 16Z"/></svg>',
+      target: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 12l5-5"/></svg>',
+      clipboard: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5h6"/><path d="M9 4h6l1 2h3v14H5V6h3l1-2Z"/><path d="m9 13 2 2 4-4"/></svg>',
+      bell: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17h12l-1.5-2.5V10a4.5 4.5 0 0 0-9 0v4.5L6 17Z"/><path d="M10 20h4"/></svg>',
+      alert: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4 3 20h18L12 4Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>',
+      chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v10H8l-3 3V6Z"/><path d="M8 10h8"/><path d="M8 13h5"/></svg>',
+      document: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h5"/><path d="M10 13h5"/><path d="M10 17h5"/></svg>',
+      send: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-8 18-3-8-8-3 19-7Z"/><path d="m10 13 5-5"/></svg>',
+      lock: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg>'
+    };
+  %>
 
   <main class="feedback-page">
     <section class="feedback-shell container">
-      <div class="feedback-header">
-        <div>
-          <p class="feedback-kicker" data-feedback-kicker><%= generatedReport ? 'RubriCheck AI report' : 'Business Analytics Report - Q2 2025' %></p>
-          <h1>AI Feedback Report</h1>
-          <p>Review your assignment readiness and improvement areas before submission.</p>
-        </div>
-
-        <div class="feedback-actions">
-          <a class="btn btn-secondary" href="/questions">Prepare Lecturer Questions</a>
-          <a class="btn btn-secondary" href="/upload">Check Another Assignment</a>
-          <a class="btn btn-primary" href="/reminder">Set Submission Reminder</a>
-          <button class="btn btn-primary" type="button" data-download-checklist>Download Checklist</button>
-        </div>
-      </div>
-
       <% if (generatedReport) { %>
-        <section class="feedback-summary-card generated-summary-card">
-          <div class="question-summary-icon" aria-hidden="true">AI</div>
+        <section class="analysis-complete-card" aria-labelledby="analysis-complete-title">
+          <div class="analysis-status-icon" aria-hidden="true"><%- icons.check %></div>
+          <div>
+            <h1 id="analysis-complete-title">Analysis Complete!</h1>
+            <p>Your assignment has been analysed using AI.</p>
+          </div>
+          <a class="btn btn-secondary banner-review-button" href="/upload"><%- icons.document %> Start New Review</a>
+        </section>
 
-          <div class="feedback-summary-copy">
-            <h2>Generated from uploaded documents</h2>
-            <span class="status-pill">Gemini feedback</span>
-            <p>This report is based only on the files submitted in this review. It is guidance for completion and readiness, not a grade prediction.</p>
+        <section class="feedback-dashboard-card" aria-labelledby="assignment-feedback-title">
+          <div class="section-title-row">
+            <span class="section-icon blue" aria-hidden="true"><%- icons.sparkles %></span>
+            <div>
+              <h2 id="assignment-feedback-title">AI Assignment Feedback</h2>
+              <% if (student.assignmentName || student.moduleCode) { %>
+                <p><%= student.assignmentName || 'Assignment review' %><%= student.moduleCode ? ` - ${student.moduleCode}` : '' %></p>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="feedback-metric-grid">
+            <article class="feedback-stat-card">
+              <span>Completion Percentage</span>
+              <strong class="blue-text"><%= completionPercent %>%</strong>
+              <div class="stat-progress"><span style="width: <%= completionPercent %>%"></span></div>
+              <small><%= completionPercent >= 70 ? 'Good progress!' : 'Keep improving.' %></small>
+            </article>
+
+            <article class="feedback-stat-card">
+              <span>Readiness Score</span>
+              <strong class="green-text"><%= readinessScore %>%</strong>
+              <div class="stat-progress green"><span style="width: <%= readinessScore %>%"></span></div>
+              <small><%= readinessScore >= 70 ? 'Almost ready.' : 'Fair' %></small>
+            </article>
+
+            <article class="feedback-stat-card centered">
+              <span>Readiness Level</span>
+              <strong class="readiness-badge"><%= readinessLevel %></strong>
+              <small>Keep going!</small>
+            </article>
+
+            <article class="feedback-stat-card recommendation-card">
+              <span>Final Recommendation</span>
+              <div>
+                <span class="mini-icon" aria-hidden="true"><%- icons.document %></span>
+                <strong><%= finalRecommendation %></strong>
+              </div>
+              <small>Almost there!</small>
+            </article>
+          </div>
+        </section>
+
+        <div class="feedback-insight-grid">
+          <section class="feedback-dashboard-card compact-card" aria-labelledby="priorities-title">
+            <div class="section-title-row">
+              <span class="section-icon blue" aria-hidden="true"><%- icons.target %></span>
+              <h2 id="priorities-title">Top 3 Priorities</h2>
+            </div>
+            <ol class="priority-list">
+              <% topPriorities.slice(0, 3).forEach((priority, index) => { %>
+                <li><span><%= index + 1 %></span><%= priority %></li>
+              <% }); %>
+            </ol>
+          </section>
+
+          <section class="feedback-dashboard-card compact-card" aria-labelledby="checklist-title">
+            <div class="section-title-row">
+              <span class="section-icon green" aria-hidden="true"><%- icons.clipboard %></span>
+              <h2 id="checklist-title">Before Submission Checklist</h2>
+            </div>
+            <ul class="clean-checklist">
+              <% checklist.slice(0, 5).forEach((item) => { %>
+                <li><span aria-hidden="true"></span><%= item %></li>
+              <% }); %>
+            </ul>
+          </section>
+        </div>
+
+        <section class="feedback-dashboard-card missing-weak-card" aria-labelledby="weak-areas-title">
+          <div class="section-title-row">
+            <span class="section-icon red" aria-hidden="true"><%- icons.alert %></span>
+            <h2 id="weak-areas-title">Missing / Weak Areas</h2>
+          </div>
+          <ul>
+            <% missingWeakAreas.slice(0, 6).forEach((area) => { %>
+              <li><%= area %></li>
+            <% }); %>
+          </ul>
+        </section>
+
+        <aside class="feedback-dashboard-card reminder-setup-card" aria-labelledby="reminder-title">
+          <div class="section-title-row">
+            <span class="section-icon purple" aria-hidden="true"><%- icons.bell %></span>
+            <h2 id="reminder-title">Reminder Setup</h2>
+          </div>
+
+          <div class="reminder-compact-grid">
+            <label>
+              Telegram Chat ID
+              <input type="text" value="<%= student.telegramChatId || '' %>" readonly>
+            </label>
+
+            <label>
+              Deadline
+              <input type="text" value="<%= formatDeadline(student.deadline) %>" readonly>
+            </label>
+
+            <div class="reminder-info-box">
+              <span><%- icons.check %> You'll receive reminders</span>
+              <span><%- icons.check %> 1 day before the deadline</span>
+              <span><%- icons.check %> On the deadline day</span>
+            </div>
+
+            <div class="reminder-action-stack">
+              <a class="btn btn-success reminder-enable-button" href="<%= generatedReviewId ? `/reminder?reviewId=${encodeURIComponent(generatedReviewId)}` : '/reminder' %>"><%- icons.send %> Enable Telegram Reminder</a>
+              <p class="reminder-privacy-note"><%- icons.lock %> Your information is secure and will only be used for reminders.</p>
+            </div>
+          </div>
+        </aside>
+
+        <section class="feedback-dashboard-card follow-up-dashboard-card" aria-labelledby="follow-up-title">
+          <div class="section-title-row">
+            <span class="section-icon purple" aria-hidden="true"><%- icons.chat %></span>
+            <div>
+              <h2 id="follow-up-title">Ask Follow-Up Questions</h2>
+              <p>Ask anything about your feedback and get AI-powered explanations.</p>
+            </div>
+          </div>
+
+          <form class="follow-up-inline-form" data-follow-up-form>
+            <input type="hidden" name="reviewId" value="<%= generatedReviewId %>">
+            <label for="follow-up-question" class="sr-only">Follow-up question</label>
+            <input id="follow-up-question" name="question" maxlength="1000" placeholder="e.g. Why is my score low?" required data-follow-up-question>
+            <button class="btn btn-primary" type="submit" data-follow-up-submit><%- icons.send %> Send</button>
+          </form>
+
+          <div class="chat-response-row">
+            <span class="chat-avatar" aria-hidden="true"><%- icons.sparkles %></span>
+            <div>
+              <article class="follow-up-answer sample-answer" aria-live="polite">
+                Ask a follow-up question to get a focused explanation based on this feedback report.
+              </article>
+              <article class="follow-up-answer hidden" data-follow-up-answer aria-live="polite"></article>
+              <p class="follow-up-timestamp">AI response generated just now</p>
+            </div>
+          </div>
+          <p class="follow-up-error hidden" data-follow-up-error role="alert"></p>
+        </section>
+
+        <section class="feedback-footer-card">
+          <details class="full-feedback-details">
+            <summary><span><%- icons.document %> View Full AI Feedback Report</span><span class="details-chevron" aria-hidden="true">v</span></summary>
+            <pre class="ai-report-text"><%= reportText %></pre>
+          </details>
+        </section>
+
+        <section class="feedback-footer-card ai-guidance-card">
+          <div class="section-title-row">
+            <span class="section-icon blue" aria-hidden="true"><%- icons.sparkles %></span>
+            <div>
+              <h2>AI-Powered Feedback</h2>
+              <p>This feedback is generated by AI and should be used as a guide to improve your assignment.</p>
+            </div>
+            <a class="btn btn-secondary" href="<%= generatedReviewId ? `/questions?reviewId=${encodeURIComponent(generatedReviewId)}` : '/questions' %>">Prepare Lecturer Questions</a>
           </div>
 
           <% if (uploadedFiles) { %>
-            <div class="uploaded-file-summary">
+            <div class="uploaded-file-summary compact-files">
               <div>
                 <strong>Assignment Brief</strong>
                 <span><%= uploadedFiles.assignmentBrief %></span>
@@ -100,156 +297,11 @@
             </div>
           <% } %>
         </section>
-
-        <article class="ai-report-card">
-          <pre class="ai-report-text"><%= generatedReport %></pre>
-        </article>
-
-        <section class="follow-up-card" aria-labelledby="follow-up-title">
-          <div class="follow-up-heading">
-            <div>
-              <h2 id="follow-up-title">Ask RubriCheck AI a follow-up question</h2>
-              <p>Ask about this feedback report, the uploaded documents, or which improvement to focus on first.</p>
-            </div>
-          </div>
-
-          <form class="follow-up-form" data-follow-up-form>
-            <input type="hidden" name="reviewId" value="<%= generatedReviewId %>">
-            <label for="follow-up-question" class="sr-only">Follow-up question</label>
-            <textarea id="follow-up-question" name="question" rows="4" maxlength="1000" placeholder="What should I fix first?" required data-follow-up-question></textarea>
-            <div class="follow-up-actions">
-              <p class="follow-up-note">Answers are limited to the uploaded documents and this feedback report.</p>
-              <button class="btn btn-primary" type="submit" data-follow-up-submit>Ask RubriCheck AI</button>
-            </div>
-          </form>
-
-          <p class="follow-up-error hidden" data-follow-up-error role="alert"></p>
-          <article class="follow-up-answer hidden" data-follow-up-answer aria-live="polite"></article>
-        </section>
       <% } else { %>
-        <section class="feedback-summary-card">
-          <div class="score-ring feedback-score-ring">
-            <span data-feedback-score>78</span>
-            <small>/ 100</small>
-          </div>
-
-          <div class="feedback-summary-copy">
-            <h2 data-feedback-heading>Overall Readiness: 78%</h2>
-            <span class="status-pill" data-feedback-status>Almost Ready</span>
-            <p data-feedback-summary>Your assignment demonstrates solid research and methodology. Key gaps exist in critical evaluation and limitations; addressing these could push your score above 90%.</p>
-          </div>
-
-          <div class="feedback-metrics" data-feedback-metrics>
-            <div class="metric-card positive">
-              <strong>4</strong>
-              <span>Strengths</span>
-            </div>
-            <div class="metric-card warning">
-              <strong>4</strong>
-              <span>Improvements</span>
-            </div>
-            <div class="metric-card danger">
-              <strong>2</strong>
-              <span>Missing criteria</span>
-            </div>
-          </div>
-        </section>
-
-        <div class="report-tabs" role="tablist" aria-label="Feedback report sections">
-          <button class="report-tab active" type="button" role="tab" aria-selected="true" data-report-tab="overview">Overview</button>
-          <button class="report-tab" type="button" role="tab" aria-selected="false" data-report-tab="suggestions">Suggestions</button>
-          <button class="report-tab" type="button" role="tab" aria-selected="false" data-report-tab="checklist">Checklist</button>
-        </div>
-
-        <section class="report-panel active" data-report-panel="overview">
-          <div class="overview-grid">
-            <article class="report-card accent-green">
-              <h2>Strengths</h2>
-              <ul class="report-list" data-strength-list>
-                <li>Clear problem statement with well-defined research objectives in the introduction.</li>
-                <li>Strong literature review using recent sources and relevant industry examples.</li>
-                <li>Methodology section shows good understanding of quantitative research design.</li>
-                <li>Data visualisations are labelled clearly and connected to the findings.</li>
-              </ul>
-            </article>
-
-            <article class="report-card accent-orange">
-              <h2>Areas for Improvement</h2>
-              <ul class="report-list" data-improvement-list>
-                <li>Explanation depth is uneven in the analysis section and needs clearer reasoning.</li>
-                <li>Some claims need stronger evidence from the dataset or cited references.</li>
-                <li>Conclusion should connect back to the research limitations and rubric criteria.</li>
-                <li>APA 7th citation formatting is inconsistent across several references.</li>
-              </ul>
-            </article>
-          </div>
-
-          <article class="report-card missing-card accent-red">
-            <h2>Missing Rubric Requirements</h2>
-            <div class="missing-grid" data-missing-criteria>
-              <div class="missing-item danger">
-                <strong>Critical Evaluation of Alternatives</strong>
-                <span>20% of total mark</span>
-                <em>Missing</em>
-              </div>
-              <div class="missing-item warning">
-                <strong>Stakeholder Impact Analysis</strong>
-                <span>10% of total mark</span>
-                <em>Partial</em>
-              </div>
-              <div class="missing-item warning">
-                <strong>Limitations &amp; Future Work</strong>
-                <span>15% of total mark</span>
-                <em>Partial</em>
-              </div>
-              <div class="missing-item danger">
-                <strong>Professional Formatting (APA 7th)</strong>
-                <span>5% of total mark</span>
-                <em>Missing</em>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <section class="report-panel" data-report-panel="suggestions" data-suggestions-list>
-          <article class="suggestion-card">
-            <div>
-              <h2>Critical Evaluation</h2>
-              <span class="priority high">High Priority</span>
-            </div>
-            <p><strong>Issue found:</strong> The report explains your selected solution but does not compare it against alternatives.</p>
-            <p><strong>Suggested improvement:</strong> Add a subsection comparing at least two alternative approaches using cost, feasibility, and impact.</p>
-            <p><strong>Example action:</strong> Add a decision matrix showing why your recommended solution is stronger than the alternatives.</p>
-          </article>
-        </section>
-
-        <section class="report-panel" data-report-panel="checklist">
-          <article class="report-card checklist-report-card">
-            <div class="checklist-heading">
-              <div>
-                <h2>Submission Checklist</h2>
-                <p data-checklist-summary>6 of 8 items complete</p>
-              </div>
-              <strong><span data-checklist-percent>75%</span> <span>complete</span></strong>
-            </div>
-
-            <div class="checklist-progress">
-              <span style="width: 75%;" data-checklist-progress></span>
-            </div>
-
-            <ul class="submission-checklist" data-feedback-checklist>
-              <li class="done"><span>&#10003;</span>Assignment draft uploaded</li>
-              <li class="done"><span>&#10003;</span>Rubric criteria checked</li>
-              <li class="done"><span>&#10003;</span>Introduction clearly explains purpose</li>
-              <li class="done"><span>&#10003;</span>Evidence added to support points</li>
-              <li class="todo"><span></span>Missing rubric criteria addressed</li>
-              <li class="done"><span>&#10003;</span>Formatting reviewed</li>
-              <li class="done"><span>&#10003;</span>References checked</li>
-              <li class="todo"><span></span>Final proofreading completed</li>
-            </ul>
-
-            <button class="btn btn-primary checklist-download-button" type="button" data-download-checklist>Download Checklist</button>
-          </article>
+        <section class="report-empty-state">
+          <h2>No feedback report yet</h2>
+          <p>Start from New Review, fill in the student information, upload the assignment brief, marking rubric, and student draft, then check the assignment to generate the connected Gemini feedback report.</p>
+          <a class="btn btn-primary" href="/upload">Go to New Review</a>
         </section>
       <% } %>
     </section>

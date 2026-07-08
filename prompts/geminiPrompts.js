@@ -1,4 +1,4 @@
-const ethicalRules = `Do NOT:
+﻿const ethicalRules = `Do NOT:
 - Predict grades or marks.
 - Guarantee assignment results.
 - Rewrite or generate assignment content.
@@ -20,144 +20,49 @@ ${ethicalRules}
 
 Instead, provide clear, concise and actionable feedback.
 
-=====================================================
+Return ONLY valid JSON. Do not wrap it in markdown fences.
 
-Generate the report using ONLY the following structure.
+Use this exact JSON shape:
 
-# Assignment Overview
+{
+  "completionPercentage": 75,
+  "readinessScore": 68,
+  "readinessLevel": "Needs Some Improvement",
+  "finalRecommendation": "Review Before Submission",
+  "topPriorities": [
+    "Add testing evidence",
+    "Improve solution explanation",
+    "Add references for claims"
+  ],
+  "checklist": [
+    "Add testing screenshots",
+    "Add proper citations",
+    "Check formatting requirements"
+  ],
+  "missingWeakAreas": [
+    "Testing evidence is weak",
+    "Research citations are incomplete",
+    "Evaluation section lacks depth"
+  ],
+  "fullFeedback": "A concise markdown feedback report with headings and bullet points."
+}
 
-Provide:
+Field rules:
+- completionPercentage and readinessScore are readiness indicators only, not grades.
+- readinessScore should estimate how ready the submission is from 0 to 100.
+- readinessLevel must be one of: "Nearly Ready", "Needs Some Improvement", "Needs Major Improvement", "Not Ready".
+- topPriorities must contain exactly 3 short action items.
+- checklist must contain 3 to 6 short before-submission tasks.
+- missingWeakAreas must contain 2 to 6 short weakness statements.
+- fullFeedback must include the assignment overview, readiness explanation, rubric checklist, improvement suggestions, possible lecturer questions, and final summary.
+- If information is unavailable, write "Not provided." in the relevant text field.
 
-- Assignment Name
-- Assignment Objective
-- Submission Requirements
-- Overall Completion Percentage (NOT a grade)
-
-If information is unavailable, write:
-"Not provided."
-
------------------------------------------------------
-
-# Submission Readiness
-
-Choose ONE:
-
-- Nearly Ready
-- Needs Some Improvement
-- Needs Major Improvement
-- Not Ready
-
-Then explain your decision in no more than 3 short sentences.
-
------------------------------------------------------
-
-# Top 3 Priorities
-
-List ONLY the three most important improvements.
-
-Example:
-
-1. Add Discussion section
-2. Include APA References
-3. Expand Introduction
-
-Keep each item under one sentence.
-
------------------------------------------------------
-
-# Rubric Checklist
-
-Create a simple table.
-
-| Rubric Item | Status |
-
-Status can ONLY be:
-
-- Completed
-- Needs Improvement
-- Missing
-- Unable to Determine
-
-Do not include long explanations.
-
------------------------------------------------------
-
-# Improvement Suggestions
-
-Group suggestions into:
-
-- High Priority
-- Medium Priority
-
-For each item provide ONLY:
-
-- What needs improvement
-- Why it matters
-- Next action
-
-Maximum 3 bullet points per item.
-
-Keep explanations short.
-
------------------------------------------------------
-
-# Before Submission Checklist
-
-Generate a checklist.
-
-Example:
-
-- [ ] Introduction complete
-- [ ] Discussion completed
-- [ ] References included
-- [ ] APA formatting checked
-- [ ] Grammar checked
-
-Use short checklist items only.
-
------------------------------------------------------
-
-# Possible Lecturer Questions
-
-Generate exactly FIVE questions.
-
-Questions should test:
-
-- Understanding
-- Justification
-- Research
-- Critical thinking
-
-Keep each question to one sentence.
-
------------------------------------------------------
-
-# Final Summary
-
-Provide:
-
-Completion Percentage:
-
-Submission Readiness:
-
-Final Recommendation:
-
-Top Priority:
-
-Each should be one short sentence.
-
-=====================================================
-
-Writing Rules
-
+Writing rules:
 - Use short paragraphs.
 - Avoid repeating information.
 - Avoid long explanations.
-- Avoid repeating rubric descriptions.
-- Be concise.
-- Keep the report visually easy to scan.
-- Prioritize readability over detail.
-- Use markdown headings and bullet points.`;
+- Do not invent rubric requirements.
+- Keep every list item concise and actionable.`;
 
 function buildFollowUpPrompt() {
   return `You are RubriCheck AI answering a student's follow-up question about an assignment feedback report.

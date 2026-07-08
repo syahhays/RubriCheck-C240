@@ -1,10 +1,10 @@
-const express = require('express');
+﻿const express = require('express');
 const { GEMINI_API_KEY } = require('../config/appConfig');
 const messages = require('../constants/messages');
 const { upload, requiredUploadFields } = require('../middleware/upload');
 const { prepareReviewDocuments } = require('../services/documentService');
 const { generateGeminiFeedback } = require('../services/geminiService');
-const { createReview } = require('../services/reviewStore');
+const { createReview, getLatestReview, getReview } = require('../services/reviewStore');
 
 const { chunkDocument } = require('../utils/chunkDocuments');
 const { searchChunks, storeChunks } = require('../services/chromaService');
@@ -24,6 +24,64 @@ function buildRetrievedDocuments(chunks) {
   }));
 }
 
+function getReviewFiles(reviewDocuments) {
+  return {
+    assignmentBrief: reviewDocuments.find((doc) => doc.label === 'Assignment Brief')?.fileName || 'Assignment Brief',
+    markingRubric: reviewDocuments.find((doc) => doc.label === 'Marking Rubric')?.fileName || 'Marking Rubric',
+    studentDraft: reviewDocuments.find((doc) => doc.label === 'Student Assignment Draft')?.fileName || 'Student Draft'
+  };
+}
+
+function getStudentInfo(body) {
+  return {
+    studentName: typeof body.studentName === 'string' ? body.studentName.trim() : '',
+    moduleCode: typeof body.moduleCode === 'string' ? body.moduleCode.trim() : '',
+    assignmentName: typeof body.assignmentName === 'string' ? body.assignmentName.trim() : '',
+    deadline: typeof body.deadline === 'string' ? body.deadline.trim() : '',
+    telegramChatId: typeof body.telegramChatId === 'string' ? body.telegramChatId.trim() : ''
+  };
+}
+
+function hasRequiredStudentInfo(studentInfo) {
+  return Boolean(
+    studentInfo.studentName
+    && studentInfo.moduleCode
+    && studentInfo.assignmentName
+    && studentInfo.deadline
+    && studentInfo.telegramChatId
+  );
+}
+
+function renderStoredReview(res, reviewId, review) {
+  return res.render('feedback', {
+    report: review.report,
+    summary: review.summary,
+    studentInfo: review.studentInfo,
+    reviewId,
+    files: getReviewFiles(review.documents)
+  });
+}
+
+router.get('/check-assignment', (req, res) => {
+  const latest = getLatestReview();
+
+  if (!latest) {
+    return res.render('feedback', { report: null, summary: null, studentInfo: null, files: null, reviewId: null });
+  }
+
+  return renderStoredReview(res, latest.reviewId, latest.review);
+});
+
+router.get('/check-assignment/:reviewId', (req, res) => {
+  const review = getReview(req.params.reviewId);
+
+  if (!review) {
+    return res.render('feedback', { report: null, summary: null, studentInfo: null, files: null, reviewId: null });
+  }
+
+  return renderStoredReview(res, req.params.reviewId, review);
+});
+
 router.post('/check-assignment', upload.fields(requiredUploadFields), async (req, res) => {
   try {
     if (!GEMINI_API_KEY) {
@@ -33,9 +91,16 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
     }
 
     const files = req.files || {};
+    const studentInfo = getStudentInfo(req.body || {});
     const assignmentBrief = getUploadedFile(files, 'assignmentBrief');
     const markingRubric = getUploadedFile(files, 'markingRubric');
     const studentDraft = getUploadedFile(files, 'studentDraft');
+
+    if (!hasRequiredStudentInfo(studentInfo)) {
+      return res.status(400).render('upload', {
+        error: 'Please complete the student information before checking the assignment.'
+      });
+    }
 
     if (!assignmentBrief || !markingRubric || !studentDraft) {
       return res.status(400).render('upload', {
@@ -65,18 +130,10 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
 
     console.log(`Retrieved ${relevantChunks.length} chunks from ChromaDB for Gemini feedback`);
 
-    const report = await generateGeminiFeedback(documentsForFeedback);
-    const reviewId = createReview(report, reviewDocuments);
+    const feedback = await generateGeminiFeedback(documentsForFeedback);
+    const reviewId = createReview(feedback.report, reviewDocuments, feedback.summary, studentInfo);
 
-    res.render('feedback', {
-      report,
-      reviewId,
-      files: {
-        assignmentBrief: assignmentBrief.originalname,
-        markingRubric: markingRubric.originalname,
-        studentDraft: studentDraft.originalname
-      }
-    });
+    res.redirect(`/check-assignment/${reviewId}`);
   } catch (error) {
     console.error('Gemini analysis failed:', error);
     res.status(500).render('upload', {

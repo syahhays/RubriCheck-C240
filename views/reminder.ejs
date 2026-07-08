@@ -52,6 +52,42 @@
     </section>
   </div>
 
+  <%
+    const reminderStudent = typeof studentInfo === 'undefined' || !studentInfo ? {} : studentInfo;
+    const reminderSummary = typeof summary === 'undefined' || !summary ? {} : summary;
+
+    function reminderListText(value, fallback) {
+      if (Array.isArray(value) && value.length > 0) {
+        return value.join('\n');
+      }
+
+      return fallback;
+    }
+
+    function reminderDateTime(value) {
+      if (!value) {
+        return '';
+      }
+
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        return `${value}T23:59`;
+      }
+
+      return value;
+    }
+
+    const reminderDefaults = {
+      studentName: reminderStudent.studentName || '',
+      telegramChatId: reminderStudent.telegramChatId || '',
+      moduleCode: reminderStudent.moduleCode || '',
+      assignmentName: reminderStudent.assignmentName || '',
+      deadline: reminderDateTime(reminderStudent.deadline),
+      readinessScore: reminderSummary.readinessScore || reminderSummary.completionPercentage || '',
+      top3Priorities: reminderListText(reminderSummary.topPriorities, ''),
+      checklist: reminderListText(reminderSummary.checklist, '')
+    };
+  %>
+
   <main class="reminder-page">
     <section class="reminder-shell container">
       <article class="reminder-card">
@@ -67,49 +103,44 @@
           <div class="reminder-grid">
             <div class="form-field">
               <label for="student-name">Student Name</label>
-              <input id="student-name" name="studentName" type="text" value="Student Name" required data-reminder-required>
+              <input id="student-name" name="studentName" type="text" value="<%= reminderDefaults.studentName %>" placeholder="Student Name" required data-reminder-required>
             </div>
 
             <div class="form-field">
               <label for="telegram-chat-id">Telegram Chat ID</label>
-              <input id="telegram-chat-id" name="telegramChatId" type="text" placeholder="Enter your Telegram Chat ID" required data-reminder-required>
+              <input id="telegram-chat-id" name="telegramChatId" type="text" value="<%= reminderDefaults.telegramChatId %>" placeholder="Enter your Telegram Chat ID" required data-reminder-required>
             </div>
 
             <div class="form-field">
               <label for="module-code">Module Code</label>
-              <input id="module-code" name="moduleCode" type="text" value="C240" required data-reminder-required>
+              <input id="module-code" name="moduleCode" type="text" value="<%= reminderDefaults.moduleCode %>" placeholder="Module Code" required data-reminder-required>
             </div>
 
             <div class="form-field">
               <label for="assignment-name">Assignment Name</label>
-              <input id="assignment-name" name="assignmentName" type="text" value="Final Assessment" required data-reminder-required>
+              <input id="assignment-name" name="assignmentName" type="text" value="<%= reminderDefaults.assignmentName %>" placeholder="Assignment Name" required data-reminder-required>
             </div>
 
             <div class="form-field">
               <label for="deadline">Deadline</label>
-              <input id="deadline" name="deadline" type="datetime-local" required data-reminder-required>
+              <input id="deadline" name="deadline" type="datetime-local" value="<%= reminderDefaults.deadline %>" required data-reminder-required>
             </div>
 
             <div class="form-field">
               <label for="readiness-score">Readiness Score</label>
-              <input id="readiness-score" name="readinessScore" type="number" min="0" max="100" value="68" required data-reminder-required>
+              <input id="readiness-score" name="readinessScore" type="number" min="0" max="100" value="<%= reminderDefaults.readinessScore %>" placeholder="Readiness Score" required data-reminder-required>
             </div>
           </div>
 
           <div class="reminder-detail-grid">
             <section class="reminder-list-card">
               <label for="top-3-priorities">Top 3 Priorities</label>
-              <textarea id="top-3-priorities" name="top3Priorities" rows="5" required data-reminder-required>Add ethical AI explanation
-Improve tool justification
-Complete checklist</textarea>
+              <textarea id="top-3-priorities" name="top3Priorities" rows="5" placeholder="Top 3 priorities from the AI report" required data-reminder-required><%= reminderDefaults.top3Priorities %></textarea>
             </section>
 
             <section class="reminder-list-card">
               <label for="checklist">Before-Submission Checklist</label>
-              <textarea id="checklist" name="checklist" rows="5" required data-reminder-required>Assignment objectives explained
-AI tools justified
-Ethical use included
-Workflow diagram included</textarea>
+              <textarea id="checklist" name="checklist" rows="5" placeholder="Checklist from the AI report" required data-reminder-required><%= reminderDefaults.checklist %></textarea>
             </section>
           </div>
 
