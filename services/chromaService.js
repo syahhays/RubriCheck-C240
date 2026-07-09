@@ -31,13 +31,9 @@ async function storeChunks(submissionId, chunks, embeddings) {
 async function searchChunks(queryEmbedding, documentType, submissionId, limit = 5) {
   const collection = await getCollection();
 
-  const where = {
-    submissionId
-  };
-
-  if (documentType) {
-    where.documentType = documentType;
-  }
+  const where = documentType
+    ? { $and: [{ submissionId: { $eq: submissionId } }, { documentType: { $eq: documentType } }] }
+    : { submissionId: { $eq: submissionId } };
 
   const results = await collection.query({
     queryEmbeddings: [queryEmbedding],
