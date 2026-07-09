@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadDemoFilesButton = document.querySelector("[data-load-demo-files]");
   const analyseButton = document.querySelector("[data-analyse-button]");
   const uploadNote = document.querySelector("[data-upload-note]");
+  const analysisLoadingOverlay = document.querySelector("[data-analysis-loading]");
   const analysisProgress = document.querySelector("[data-analysis-progress]");
   const analysisPercent = document.querySelector("[data-analysis-percent]");
   const analysisSteps = document.querySelectorAll("[data-analysis-steps] .analysis-step");
@@ -247,6 +248,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       analyseButton.disabled = true;
       analyseButton.textContent = 'Checking your assignment...';
+      document.body.classList.add("is-analysis-loading");
+
+      if (analysisLoadingOverlay) {
+        analysisLoadingOverlay.classList.remove("hidden");
+      }
 
       if (uploadNote) {
         uploadNote.textContent = 'Please wait while Gemini analyses the uploaded documents.';

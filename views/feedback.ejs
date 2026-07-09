@@ -67,6 +67,65 @@
       send: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 3-8 18-3-8-8-3 19-7Z"/><path d="m10 13 5-5"/></svg>',
       lock: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg>'
     };
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatInlineMarkdown(value) {
+      return escapeHtml(value).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    function formatReportHtml(value) {
+      const lines = String(value || '').split(/\r?\n/);
+      const html = [];
+      let listOpen = false;
+
+      function closeList() {
+        if (listOpen) {
+          html.push('</ul>');
+          listOpen = false;
+        }
+      }
+
+      lines.forEach((line) => {
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+          closeList();
+          return;
+        }
+
+        const headingMatch = trimmed.match(/^(#{1,4})\s+(.+)$/);
+        if (headingMatch) {
+          closeList();
+          const level = Math.min(headingMatch[1].length + 1, 4);
+          html.push(`<h${level}>${formatInlineMarkdown(headingMatch[2])}</h${level}>`);
+          return;
+        }
+
+        const bulletMatch = trimmed.match(/^[-*]\s+(.+)$/);
+        if (bulletMatch) {
+          if (!listOpen) {
+            html.push('<ul>');
+            listOpen = true;
+          }
+          html.push(`<li>${formatInlineMarkdown(bulletMatch[1])}</li>`);
+          return;
+        }
+
+        closeList();
+        html.push(`<p>${formatInlineMarkdown(trimmed)}</p>`);
+      });
+
+      closeList();
+      return html.join('');
+    }
   %>
 
   <main class="feedback-page">
@@ -81,45 +140,48 @@
           <a class="btn btn-secondary banner-review-button" href="/upload"><%- icons.document %> Start New Review</a>
         </section>
 
-        <section class="feedback-dashboard-card" aria-labelledby="assignment-feedback-title">
-          <div class="section-title-row">
-            <span class="section-icon blue" aria-hidden="true"><%- icons.sparkles %></span>
-            <div>
-              <h2 id="assignment-feedback-title">AI Assignment Feedback</h2>
-              <% if (student.assignmentName || student.moduleCode) { %>
-                <p><%= student.assignmentName || 'Assignment review' %><%= student.moduleCode ? ` - ${student.moduleCode}` : '' %></p>
-              <% } %>
+        <section class="feedback-dashboard-card feedback-overview-card" aria-labelledby="assignment-feedback-title">
+          <div class="feedback-overview-header">
+            <div class="section-title-row">
+              <span class="section-icon blue" aria-hidden="true"><%- icons.sparkles %></span>
+              <div>
+                <h2 id="assignment-feedback-title">AI Assignment Feedback</h2>
+                <% if (student.assignmentName || student.moduleCode) { %>
+                  <p><%= student.assignmentName || 'Assignment review' %><%= student.moduleCode ? ` - ${student.moduleCode}` : '' %></p>
+                <% } %>
+              </div>
             </div>
+            <span class="feedback-status-pill"><%= finalRecommendation %></span>
           </div>
 
-          <div class="feedback-metric-grid">
+          <div class="feedback-scoreboard">
             <article class="feedback-stat-card">
-              <span>Completion Percentage</span>
+              <span>Completion</span>
               <strong class="blue-text"><%= completionPercent %>%</strong>
               <div class="stat-progress"><span style="width: <%= completionPercent %>%"></span></div>
-              <small><%= completionPercent >= 70 ? 'Good progress!' : 'Keep improving.' %></small>
+              <small><%= completionPercent >= 70 ? 'Good progress' : 'Needs more work' %></small>
             </article>
 
             <article class="feedback-stat-card">
               <span>Readiness Score</span>
               <strong class="green-text"><%= readinessScore %>%</strong>
               <div class="stat-progress green"><span style="width: <%= readinessScore %>%"></span></div>
-              <small><%= readinessScore >= 70 ? 'Almost ready.' : 'Fair' %></small>
+              <small><%= readinessScore >= 70 ? 'Nearly ready' : 'Needs revision' %></small>
             </article>
 
-            <article class="feedback-stat-card centered">
-              <span>Readiness Level</span>
-              <strong class="readiness-badge"><%= readinessLevel %></strong>
-              <small>Keep going!</small>
-            </article>
-
-            <article class="feedback-stat-card recommendation-card">
-              <span>Final Recommendation</span>
-              <div>
-                <span class="mini-icon" aria-hidden="true"><%- icons.document %></span>
-                <strong><%= finalRecommendation %></strong>
+            <article class="readiness-summary-card">
+              <div class="readiness-level-panel">
+                <span>Readiness Level</span>
+                <strong class="readiness-badge"><%= readinessLevel %></strong>
               </div>
-              <small>Almost there!</small>
+              <div class="recommendation-inline">
+                <span class="mini-icon" aria-hidden="true"><%- icons.document %></span>
+                <div>
+                  <span>Recommendation</span>
+                  <strong><%= finalRecommendation %></strong>
+                  <small>Review the priority fixes before final submission.</small>
+                </div>
+              </div>
             </article>
           </div>
         </section>
@@ -259,26 +321,30 @@
         <section class="feedback-footer-card">
           <details class="full-feedback-details">
             <summary><span><%- icons.document %> View Full AI Feedback Report</span><span class="details-chevron" aria-hidden="true">v</span></summary>
-            <pre class="ai-report-text"><%= reportText %></pre>
+            <div class="ai-report-formatted"><%- formatReportHtml(reportText) %></div>
           </details>
         </section>
 
         <section class="feedback-footer-card ai-guidance-card">
-          <div class="section-title-row">
-            <span class="section-icon blue" aria-hidden="true"><%- icons.sparkles %></span>
-            <div>
-              <h2>AI-Powered Feedback</h2>
-              <p>This feedback is generated by AI and should be used as a guide to improve your assignment.</p>
+          <div class="ai-guidance-header">
+            <div class="section-title-row">
+              <span class="section-icon blue" aria-hidden="true"><%- icons.sparkles %></span>
+              <div>
+                <h2>AI-Powered Feedback</h2>
+                <p>This feedback is generated by AI and should be used as a guide to improve your assignment.</p>
+              </div>
             </div>
             <a class="btn btn-secondary" href="<%= generatedReviewId ? `/questions?reviewId=${encodeURIComponent(generatedReviewId)}` : '/questions' %>">Prepare Lecturer Questions</a>
           </div>
 
-          <% if (generatedReviewId) { %>
-            <div class="report-download-row" aria-label="Download feedback report">
-              <a class="btn btn-secondary" href="/check-assignment/<%= encodeURIComponent(generatedReviewId) %>/download.txt">Download TXT</a>
-              <a class="btn btn-secondary" href="/check-assignment/<%= encodeURIComponent(generatedReviewId) %>/download.html">Download HTML</a>
-            </div>
-          <% } %>
+          <div class="ai-guidance-actions">
+            <% if (generatedReviewId) { %>
+              <div class="report-download-row" aria-label="Download feedback report">
+                <a class="btn btn-secondary" href="/check-assignment/<%= encodeURIComponent(generatedReviewId) %>/download.txt">Download TXT</a>
+                <a class="btn btn-secondary" href="/check-assignment/<%= encodeURIComponent(generatedReviewId) %>/download.html">Download HTML</a>
+              </div>
+            <% } %>
+          </div>
 
           <% if (uploadedFiles) { %>
             <div class="uploaded-file-summary compact-files">

@@ -120,3 +120,17 @@
     <p data-upload-note>Student information and all three files are required before AI analysis can begin.</p>
   </div>
 </form>
+
+<div class="analysis-loading-overlay hidden" data-analysis-loading role="status" aria-live="polite" aria-label="RubriCheck AI is analysing your assignment">
+  <section class="analysis-loading-card">
+    <div class="analysis-loading-spinner" aria-hidden="true"></div>
+    <p class="analysis-loading-kicker">RubriCheck AI is working</p>
+    <h2>Analysing your assignment...</h2>
+    <p>Extracting text, retrieving rubric context from ChromaDB, and generating Gemini feedback. This can take a moment.</p>
+    <div class="analysis-loading-steps" aria-hidden="true">
+      <span>Reading documents</span>
+      <span>Checking rubric</span>
+      <span>Preparing feedback</span>
+    </div>
+  </section>
+</div>
