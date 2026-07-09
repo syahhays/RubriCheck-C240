@@ -1,0 +1,27 @@
+<%
+  const active = typeof activePage === 'undefined' ? '' : activePage;
+  const showAnchors = typeof landingAnchors === 'undefined' ? false : landingAnchors;
+%>
+<header class="site-header">
+  <div class="container nav-bar">
+    <a class="brand" href="/" aria-label="RubriCheck AI home">
+      <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
+      <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
+    </a>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <% if (showAnchors) { %>
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#demo">Demo</a>
+        <a class="nav-link" href="#team">Team</a>
+      <% } else { %>
+        <a class="nav-link <%= active === 'home' ? 'active' : '' %>" href="/">Home</a>
+        <a class="nav-link <%= active === 'dashboard' ? 'active' : '' %>" href="/dashboard">Dashboard</a>
+        <a class="nav-link <%= active === 'upload' ? 'active' : '' %>" href="/upload">New Review</a>
+      <% } %>
+    </nav>
+
+    <a class="btn btn-primary nav-cta" href="/#demo">Analyze Assignment</a>
+  </div>
+</header>

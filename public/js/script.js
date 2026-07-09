@@ -5,15 +5,6 @@ const AI_ANALYSIS_API_URL = "";
 // Future n8n webhook integration point: add the n8n reminder webhook URL here later.
 const N8N_WEBHOOK_URL = "";
 
-// Replaceable demo data. Future backend integration point:
-// these objects can later be loaded from a database or API response.
-const DEMO_USER = {
-  name: "Demo Student",
-  initials: "DS",
-  email: "student@myrp.edu.sg",
-  password: "password"
-};
-
 const DEMO_UPLOAD_FILES = {
   brief: {
     fileName: "Business_Analytics_Brief.pdf",
@@ -40,12 +31,7 @@ const frontendState = {
 document.addEventListener("DOMContentLoaded", () => {
   const navLinks = document.querySelectorAll(".nav-link");
   const currentPath = window.location.pathname;
-  const loginButton = document.querySelector("[data-login-open]");
-  const loginModal = document.querySelector("[data-login-modal]");
-  const closeLoginButton = document.querySelector("[data-login-close]");
-  const demoLoginButton = document.querySelector("[data-demo-login]");
-  const userChip = document.querySelector("[data-user-chip]");
-  const authArea = document.querySelector(".auth-area");
+  const revealElements = document.querySelectorAll(".reveal-on-scroll");
   const uploadForm = document.querySelector("[data-upload-form]");
   const uploadCards = document.querySelectorAll("[data-upload-card]");
   const studentInfoFields = document.querySelectorAll("[data-student-info-required]");
@@ -67,134 +53,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const reminderSuccess = document.querySelector("[data-reminder-success]");
   const reminderError = document.querySelector("[data-reminder-error]");
 
-  function setValue(selector, value) {
-    const element = document.querySelector(selector);
-
-    if (element) {
-      element.value = value;
-    }
-  }
-
   navLinks.forEach((link) => {
-    if (link.getAttribute("href") === currentPath) {
+    const linkTarget = link.getAttribute("href") || "";
+
+    if (linkTarget === currentPath) {
       link.classList.add("active");
     }
   });
 
-  if (authArea && userChip && !authArea.querySelector("[data-demo-logout]")) {
-    const accountMenu = document.createElement("div");
-    accountMenu.className = "account-menu";
-    accountMenu.innerHTML = '<button class="logout-button" type="button" data-demo-logout>Log Out</button>';
-    authArea.appendChild(accountMenu);
-  }
+  if (revealElements.length > 0) {
+    if ("IntersectionObserver" in window) {
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.16 });
 
-  if (userChip) {
-    const userIcon = userChip.querySelector(".user-icon");
-    const userName = userChip.querySelector("span:last-child");
-
-    if (userIcon) {
-      userIcon.textContent = DEMO_USER.initials;
+      revealElements.forEach((element) => revealObserver.observe(element));
+    } else {
+      revealElements.forEach((element) => element.classList.add("is-visible"));
     }
-
-    if (userName) {
-      userName.textContent = DEMO_USER.name;
-    }
-  }
-
-  if (userChip && authArea) {
-    userChip.addEventListener("click", (event) => {
-      event.preventDefault();
-      authArea.classList.toggle("menu-open");
-    });
-
-    document.addEventListener("click", (event) => {
-      if (!authArea.contains(event.target)) {
-        authArea.classList.remove("menu-open");
-      }
-    });
-  }
-
-  function showLoggedInState() {
-    if (!loginButton || !userChip) {
-      return;
-    }
-
-    loginButton.classList.add("hidden");
-    userChip.classList.remove("hidden");
-
-    if (authArea) {
-      authArea.classList.add("is-logged-in");
-    }
-  }
-
-  function showLoggedOutState() {
-    if (!loginButton || !userChip) {
-      return;
-    }
-
-    localStorage.removeItem("rubricheckDemoLoggedIn");
-    userChip.classList.add("hidden");
-    loginButton.classList.remove("hidden");
-
-    if (authArea) {
-      authArea.classList.remove("is-logged-in");
-      authArea.classList.remove("menu-open");
-    }
-
-    if (window.location.pathname !== "/") {
-      window.location.href = "/";
-    }
-  }
-
-  function openLoginModal() {
-    if (loginModal) {
-      loginModal.classList.remove("hidden");
-    }
-  }
-
-  function closeLoginModal() {
-    if (loginModal) {
-      loginModal.classList.add("hidden");
-    }
-  }
-
-  setValue("#demo-email", DEMO_USER.email);
-  setValue("#demo-password", DEMO_USER.password);
-
-  if (localStorage.getItem("rubricheckDemoLoggedIn") === "true") {
-    showLoggedInState();
-  }
-
-  if (loginButton) {
-    loginButton.addEventListener("click", openLoginModal);
-  }
-
-  if (closeLoginButton) {
-    closeLoginButton.addEventListener("click", closeLoginModal);
-  }
-
-  if (loginModal) {
-    loginModal.addEventListener("click", (event) => {
-      if (event.target === loginModal) {
-        closeLoginModal();
-      }
-    });
-  }
-
-  if (demoLoginButton) {
-    demoLoginButton.addEventListener("click", () => {
-      // This is prototype-only auth state. Future backend integration point:
-      // replace this with a real login API when authentication is added.
-      localStorage.setItem("rubricheckDemoLoggedIn", "true");
-      showLoggedInState();
-      closeLoginModal();
-    });
-  }
-
-  const demoLogoutButton = document.querySelector("[data-demo-logout]");
-
-  if (demoLogoutButton) {
-    demoLogoutButton.addEventListener("click", showLoggedOutState);
   }
 
   function setCardFile(card, fileName, fileType) {

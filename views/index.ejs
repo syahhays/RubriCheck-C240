@@ -3,234 +3,316 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RubriCheck AI | Home</title>
+  <title>RubriCheck AI | Assignment Feedback with RAG</title>
   <link rel="icon" type="image/png" href="/images/RubriCheck%20Logo.png">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav-bar">
-      <a class="brand" href="/" aria-label="RubriCheck AI home">
-        <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
-        <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
-      </a>
+  <%- include('partials/header', { activePage: 'home', landingAnchors: true }) %>
 
-      <nav class="main-nav" aria-label="Main navigation">
-        <a class="nav-link active" href="/">Home</a>
-        <a class="nav-link" href="/dashboard">Dashboard</a>
-        <a class="nav-link" href="/upload">New Review</a>
-      </nav>
+  <main class="landing-page">
+    <section class="landing-hero" id="top">
+      <div class="container landing-hero-grid">
+        <div class="hero-copy-block reveal-on-scroll">
+          <p class="eyebrow">
+            <span class="eyebrow-icon">AI</span>
+            RAG-powered assignment review for students
+          </p>
+          <h1>RubriCheck AI</h1>
+          <p class="hero-tagline">Know what to improve before you submit.</p>
+          <p class="hero-copy">
+            RubriCheck AI compares your assignment brief, marking rubric, and student draft.
+            It retrieves the most relevant rubric context with ChromaDB, asks Gemini to analyse it,
+            then returns structured feedback, checklist items, lecturer questions, and reminder support.
+          </p>
 
-      <div class="auth-area" aria-label="Account actions">
-        <button class="login-button" type="button" data-login-open>Log In</button>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#demo">Analyze Assignment</a>
+            <a class="btn btn-secondary" href="#how-it-works">See Workflow</a>
+          </div>
 
-        <a class="user-chip hidden" href="/dashboard" aria-label="Open user dashboard" data-user-chip>
-          <!-- Placeholder user icon. Replace with profile photo later if needed. -->
-          <span class="user-icon">DS</span>
-          <span>Demo Student</span>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <div class="modal-overlay hidden" data-login-modal>
-    <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
-      <button class="modal-close" type="button" aria-label="Close login" data-login-close>&times;</button>
-
-      <img class="modal-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
-      <h2 id="login-title">Log in to RubriCheck AI</h2>
-      <p>This is a frontend demo login. No real account or password is needed yet.</p>
-
-      <form class="login-form">
-        <label for="demo-email">Email</label>
-        <input id="demo-email" type="email" value="student@myrp.edu.sg" readonly>
-
-        <label for="demo-password">Password</label>
-        <input id="demo-password" type="password" value="password" readonly>
-
-        <button class="btn btn-primary" type="button" data-demo-login>Use Demo Login</button>
-      </form>
-    </section>
-  </div>
-
-  <main class="home-page">
-    <section class="hero-section">
-      <div class="container hero-content">
-        <p class="eyebrow">
-          <span class="eyebrow-icon">AI</span>
-          AI-powered assignment review for polytechnic students
-        </p>
-
-        <h1>Know your assignment <span>is ready to submit.</span></h1>
-        <p class="hero-copy">
-          RubriCheck AI analyses your draft against your marking rubric,
-          identifies gaps, and gives you actionable feedback before your
-          lecturer does.
-        </p>
-
-        <div class="hero-actions">
-          <a class="btn btn-primary" href="/upload">Start Reviewing <span aria-hidden="true">-&gt;</span></a>
-          <a class="btn btn-secondary" href="/dashboard">View Dashboard</a>
+          <div class="hero-proof-row" aria-label="RubriCheck AI strengths">
+            <span>Gemini feedback</span>
+            <span>ChromaDB retrieval</span>
+            <span>Telegram reminders</span>
+          </div>
         </div>
 
-        <article class="analysis-preview" aria-label="RubriCheck AI live analysis preview">
+        <article class="hero-product-panel reveal-on-scroll" aria-label="RubriCheck AI feedback preview">
           <div class="preview-topbar">
             <div class="window-dots" aria-hidden="true">
               <span class="dot red"></span>
               <span class="dot yellow"></span>
               <span class="dot green"></span>
             </div>
-            <strong>RubriCheck AI - Live Analysis</strong>
+            <strong>Live Rubric Review</strong>
           </div>
 
-          <div class="preview-body">
+          <div class="hero-score-layout">
             <div class="score-panel">
-              <p class="panel-label">Readiness Score</p>
+              <p class="panel-label">Readiness</p>
               <div class="score-ring">
                 <span>78</span>
                 <small>/ 100</small>
               </div>
-              <p class="score-caption">Strong draft</p>
+              <p class="score-caption">Review before submission</p>
             </div>
 
             <div class="rubric-panel">
               <p class="panel-label">Rubric Coverage</p>
-
               <div class="rubric-row">
                 <div class="rubric-label">
-                  <span>Research Quality</span>
-                  <strong>90%</strong>
+                  <span>Problem Analysis</span>
+                  <strong>86%</strong>
                 </div>
-                <div class="progress-track">
-                  <span class="progress-fill green" style="width: 90%;"></span>
-                </div>
+                <div class="progress-track"><span class="progress-fill green" style="width: 86%;"></span></div>
               </div>
-
               <div class="rubric-row">
                 <div class="rubric-label">
-                  <span>Critical Analysis</span>
-                  <strong>62%</strong>
+                  <span>Evidence Quality</span>
+                  <strong>64%</strong>
                 </div>
-                <div class="progress-track">
-                  <span class="progress-fill blue" style="width: 62%;"></span>
-                </div>
+                <div class="progress-track"><span class="progress-fill blue" style="width: 64%;"></span></div>
               </div>
-
               <div class="rubric-row">
                 <div class="rubric-label">
-                  <span>Formatting &amp; Citations</span>
-                  <strong>55%</strong>
+                  <span>Referencing</span>
+                  <strong>52%</strong>
                 </div>
-                <div class="progress-track">
-                  <span class="progress-fill orange" style="width: 55%;"></span>
-                </div>
+                <div class="progress-track"><span class="progress-fill orange" style="width: 52%;"></span></div>
               </div>
+            </div>
+          </div>
 
-              <div class="rubric-row">
-                <div class="rubric-label">
-                  <span>Conclusions</span>
-                  <strong>40%</strong>
-                </div>
-                <div class="progress-track">
-                  <span class="progress-fill orange" style="width: 40%;"></span>
-                </div>
-              </div>
+          <div class="hero-feedback-card">
+            <span class="mini-icon">AI</span>
+            <div>
+              <strong>Top priority</strong>
+              <p>Add clearer evidence for the rubric criterion on justification and impact.</p>
             </div>
           </div>
         </article>
       </div>
     </section>
 
-    <section class="stats-band" aria-label="RubriCheck AI results">
-      <div class="container stats-grid">
-        <div>
-          <strong>94%</strong>
-          <span>Student satisfaction</span>
+    <section class="landing-section split-section" id="about">
+      <div class="container split-grid">
+        <div class="section-heading align-left reveal-on-scroll">
+          <p class="section-kicker">About the Project</p>
+          <h2>Students need clearer feedback before the deadline, not after grades are released.</h2>
+          <p>
+            Assignment rubrics can be detailed, but students often struggle to translate each criterion
+            into concrete improvements. RubriCheck AI turns uploaded documents into a practical review
+            session, helping students find weak areas, understand rubric expectations, and plan final edits.
+          </p>
         </div>
-        <div>
-          <strong>2.3x</strong>
-          <span>Average grade improvement</span>
-        </div>
-        <div>
-          <strong>15k+</strong>
-          <span>Assignments reviewed</span>
-        </div>
-        <div>
-          <strong>&lt; 60s</strong>
-          <span>Feedback turnaround</span>
+
+        <div class="mini-metric-grid reveal-on-scroll">
+          <article>
+            <span>01</span>
+            <h3>Problem</h3>
+            <p>Students miss hidden rubric requirements and submit drafts without a clear readiness check.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Solution</h3>
+            <p>AI reviews the draft against the brief and rubric, then returns specific next steps.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Why AI</h3>
+            <p>Gemini can summarise, compare, explain, and generate follow-up guidance from the documents.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Benefits</h3>
+            <p>Students get faster revision decisions, better preparation, and fewer last-minute mistakes.</p>
+          </article>
         </div>
       </div>
     </section>
 
-    <section class="features-section section-pad">
+    <section class="landing-section" id="features">
       <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">What RubriCheck AI Does</p>
-          <h2>Everything you need before you submit</h2>
+        <div class="section-heading reveal-on-scroll">
+          <p class="section-kicker">Features</p>
+          <h2>One workflow for review, revision, practice, and reminders</h2>
         </div>
 
-        <div class="feature-grid">
-          <article class="feature-card">
-            <span class="feature-icon blue">AI</span>
-            <h3>AI Rubric Analysis</h3>
-            <p>Upload your marking rubric and let our AI decode every criterion, weighting, and requirement so nothing slips through.</p>
+        <div class="feature-grid presentation-grid">
+          <article class="feature-card reveal-on-scroll">
+            <span class="feature-icon blue">UP</span>
+            <h3>Assignment Analysis</h3>
+            <p>Processes the assignment brief, rubric, and draft in one upload flow.</p>
           </article>
-
-          <article class="feature-card">
-            <span class="feature-icon purple">FB</span>
-            <h3>Assignment Feedback</h3>
-            <p>Receive paragraph-level suggestions aligned to rubric criteria. Know exactly what to strengthen before submission.</p>
+          <article class="feature-card reveal-on-scroll">
+            <span class="feature-icon mint">RB</span>
+            <h3>Rubric Checking</h3>
+            <p>Maps feedback to rubric expectations so students know what matters.</p>
           </article>
-
-          <article class="feature-card">
-            <span class="feature-icon mint">CL</span>
-            <h3>Submission Checklist</h3>
-            <p>Auto-generated checklist of every requirement. Tick them off one by one and submit with absolute confidence.</p>
+          <article class="feature-card reveal-on-scroll">
+            <span class="feature-icon purple">AI</span>
+            <h3>AI Feedback</h3>
+            <p>Uses Gemini to generate readable strengths, gaps, priorities, and recommendations.</p>
           </article>
-
-          <article class="feature-card">
+          <article class="feature-card reveal-on-scroll">
+            <span class="feature-icon green">CL</span>
+            <h3>Before-Submission Checklist</h3>
+            <p>Turns feedback into concrete checks students can complete before uploading.</p>
+          </article>
+          <article class="feature-card reveal-on-scroll">
             <span class="feature-icon violet">Q</span>
             <h3>Lecturer Question Generator</h3>
-            <p>Prepare for viva and presentations with AI-generated questions your lecturer is likely to ask based on your work.</p>
+            <p>Creates likely viva or presentation questions from the feedback and documents.</p>
+          </article>
+          <article class="feature-card reveal-on-scroll">
+            <span class="feature-icon orange">TG</span>
+            <h3>Telegram Reminder Integration</h3>
+            <p>Prepares reminder details for n8n automation and Telegram notifications.</p>
+          </article>
+          <article class="feature-card reveal-on-scroll">
+            <span class="feature-icon blue">RAG</span>
+            <h3>RAG-powered Document Analysis</h3>
+            <p>Stores document chunks in ChromaDB and retrieves relevant context for Gemini.</p>
+          </article>
+          <article class="feature-card reveal-on-scroll">
+            <span class="feature-icon mint">ETH</span>
+            <h3>Ethical AI Guidance</h3>
+            <p>Positions AI feedback as a learning guide, not a replacement for student work.</p>
           </article>
         </div>
       </div>
     </section>
 
-    <section class="process-section section-pad">
+    <section class="landing-section workflow-section" id="how-it-works">
       <div class="container">
-        <div class="section-heading">
-          <p class="section-kicker">Process</p>
-          <h2>Three steps to submission confidence</h2>
+        <div class="section-heading reveal-on-scroll">
+          <p class="section-kicker">How It Works</p>
+          <h2>A clear AI pipeline from upload to action</h2>
         </div>
 
-        <div class="process-grid">
-          <article class="process-step">
-            <span>01</span>
-            <h3>Upload</h3>
-            <p>Drop in your assignment draft and marking rubric PDF.</p>
-          </article>
-
-          <article class="process-step">
-            <span>02</span>
-            <h3>Analyse</h3>
-            <p>Our AI reads, compares, and maps your work to every rubric criterion.</p>
-          </article>
-
-          <article class="process-step">
-            <span>03</span>
-            <h3>Improve</h3>
-            <p>Get targeted feedback, a checklist, and question prep, then submit.</p>
-          </article>
+        <div class="workflow-grid reveal-on-scroll" aria-label="RubriCheck AI workflow">
+          <article><span>1</span><h3>Upload Files</h3><p>Brief, rubric, and draft are submitted through the existing upload route.</p></article>
+          <article><span>2</span><h3>Extract Text</h3><p>The backend reads supported PDF, DOCX, and TXT documents.</p></article>
+          <article><span>3</span><h3>Retrieve Context</h3><p>RAG searches ChromaDB for rubric and document chunks relevant to the draft.</p></article>
+          <article><span>4</span><h3>Gemini Analysis</h3><p>Gemini compares the retrieved evidence and produces structured feedback.</p></article>
+          <article><span>5</span><h3>Student Feedback</h3><p>Results appear as scores, priorities, weak areas, checklist items, and report downloads.</p></article>
+          <article><span>6</span><h3>Reminders</h3><p>Students can enable Telegram reminders through the n8n reminder workflow.</p></article>
         </div>
       </div>
     </section>
 
-    <section class="cta-section">
-      <div class="container cta-content">
-        <h2>Ready to level up your assignments?</h2>
-        <p>Join thousands of poly students who review smarter, not harder.</p>
-        <a class="btn btn-light" href="/upload">Start your free review <span aria-hidden="true">-&gt;</span></a>
+    <section class="landing-section demo-section" id="demo">
+      <div class="container">
+        <div class="section-heading reveal-on-scroll">
+          <p class="section-kicker">Demo</p>
+          <h2>Upload documents and run the real AI analysis flow</h2>
+          <p>This form uses the existing `/check-assignment` route, Gemini integration, RAG retrieval, and upload handling.</p>
+        </div>
+
+        <div class="demo-grid">
+          <div class="homepage-upload-card reveal-on-scroll">
+            <%- include('partials/uploadForm', { error: typeof error === 'undefined' ? null : error }) %>
+          </div>
+
+          <aside class="feedback-preview-stack reveal-on-scroll" aria-label="AI feedback preview">
+            <article class="feedback-dashboard-card compact-card">
+              <div class="section-title-row">
+                <span class="section-icon blue" aria-hidden="true">AI</span>
+                <div>
+                  <h3>AI Feedback Preview</h3>
+                  <p>After upload, the generated report displays as structured cards.</p>
+                </div>
+              </div>
+              <div class="feedback-metric-grid demo-metric-grid">
+                <article class="feedback-stat-card">
+                  <span>Completion</span>
+                  <strong class="blue-text">80%</strong>
+                  <div class="stat-progress"><span style="width: 80%;"></span></div>
+                </article>
+                <article class="feedback-stat-card">
+                  <span>Readiness</span>
+                  <strong class="green-text">75%</strong>
+                  <div class="stat-progress green"><span style="width: 75%;"></span></div>
+                </article>
+              </div>
+            </article>
+
+            <article class="chat-preview-card">
+              <div class="section-title-row">
+                <span class="section-icon purple" aria-hidden="true">Q</span>
+                <div>
+                  <h3>Follow-up AI Chat Assistant</h3>
+                  <p>Available below the generated feedback and powered by the existing Gemini follow-up endpoint.</p>
+                </div>
+              </div>
+              <div class="suggestion-chip-row">
+                <span>What should I improve first?</span>
+                <span>Explain this rubric criterion.</span>
+                <span>Why is my readiness low?</span>
+                <span>How can I improve my introduction?</span>
+              </div>
+              <div class="chat-input-preview" aria-hidden="true">
+                <span>Ask about your generated feedback...</span>
+                <strong>Send</strong>
+              </div>
+            </article>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section reminder-flow-section" id="reminders">
+      <div class="container">
+        <div class="section-heading reveal-on-scroll">
+          <p class="section-kicker">Reminder Integration</p>
+          <h2>From AI feedback to deadline action</h2>
+        </div>
+
+        <div class="reminder-flow reveal-on-scroll">
+          <article><span>AI</span><h3>AI Feedback</h3><p>RubriCheck identifies priorities and checklist items.</p></article>
+          <article><span>ON</span><h3>Enable Reminder</h3><p>Student confirms deadline and Telegram Chat ID.</p></article>
+          <article><span>N8N</span><h3>n8n Automation</h3><p>The reminder workflow prepares scheduled messages.</p></article>
+          <article><span>TG</span><h3>Telegram Reminder</h3><p>Students receive deadline reminders before submission.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section tech-section" id="technology">
+      <div class="container">
+        <div class="section-heading reveal-on-scroll">
+          <p class="section-kicker">Technology Stack</p>
+          <h2>Built with a practical full-stack AI architecture</h2>
+        </div>
+
+        <div class="tech-grid reveal-on-scroll">
+          <span>Google Gemini</span>
+          <span>RAG</span>
+          <span>ChromaDB</span>
+          <span>Node.js</span>
+          <span>Express</span>
+          <span>n8n</span>
+          <span>MySQL</span>
+          <span>HTML</span>
+          <span>CSS</span>
+          <span>JavaScript</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="landing-section team-section" id="team">
+      <div class="container">
+        <div class="section-heading reveal-on-scroll">
+          <p class="section-kicker">Team</p>
+          <h2>Final-year AI project presentation</h2>
+          <p>RubriCheck AI was built for C240 AI Essentials and Innovations as a student-focused rubric review system.</p>
+        </div>
+
+        <div class="team-grid reveal-on-scroll">
+          <article><span>RC</span><h3>RubriCheck Team</h3><p>AI workflow, web application, reminder automation, and presentation build.</p></article>
+          <article><span>C240</span><h3>Module</h3><p>C240 AI Essentials and Innovations.</p></article>
+          <article><span>AI</span><h3>Project Focus</h3><p>Responsible use of AI to support learning, revision, and submission readiness.</p></article>
+        </div>
       </div>
     </section>
   </main>
@@ -241,7 +323,7 @@
         <img class="footer-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
         <strong>RubriCheck AI</strong>
       </div>
-      <p>Built for polytechnic students. &copy; 2025 RubriCheck AI.</p>
+      <p>RubriCheck Team | C240 AI Essentials and Innovations | &copy; 2026 RubriCheck AI.</p>
     </div>
   </footer>
 

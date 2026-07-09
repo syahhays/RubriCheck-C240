@@ -1,0 +1,122 @@
+<%
+  const uploadError = typeof error === 'undefined' ? null : error;
+%>
+
+<% if (uploadError) { %>
+  <div class="upload-error" role="alert"><%= uploadError %></div>
+<% } %>
+
+<form class="upload-form" action="/check-assignment" method="post" enctype="multipart/form-data" data-upload-form novalidate>
+  <section class="student-info-card" aria-labelledby="student-info-title">
+    <h2 id="student-info-title">Student Information</h2>
+
+    <div class="student-info-grid">
+      <div class="form-field">
+        <label for="student-name">Student Name</label>
+        <input id="student-name" name="studentName" type="text" required data-student-info-required>
+        <span class="field-error hidden" data-field-error>Please enter the student name.</span>
+      </div>
+
+      <div class="form-field">
+        <label for="module-code">Module Code</label>
+        <input id="module-code" name="moduleCode" type="text" required data-student-info-required>
+        <span class="field-error hidden" data-field-error>Please enter the module code.</span>
+      </div>
+
+      <div class="form-field">
+        <label for="assignment-name">Assignment Name</label>
+        <input id="assignment-name" name="assignmentName" type="text" required data-student-info-required>
+        <span class="field-error hidden" data-field-error>Please enter the assignment name.</span>
+      </div>
+
+      <div class="form-field">
+        <label for="deadline">Deadline</label>
+        <input id="deadline" name="deadline" type="date" required data-student-info-required>
+        <span class="field-error hidden" data-field-error>Please select the deadline.</span>
+      </div>
+
+      <div class="form-field">
+        <label for="telegram-chat-id">Telegram Chat ID</label>
+        <input id="telegram-chat-id" name="telegramChatId" type="text" required data-student-info-required>
+        <span class="field-error hidden" data-field-error>Please enter the Telegram Chat ID.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="upload-documents-section" aria-labelledby="upload-documents-title">
+    <h2 id="upload-documents-title">Upload Documents</h2>
+
+    <div class="upload-card-grid">
+      <article class="upload-card" data-upload-card data-file-key="brief">
+        <label class="upload-drop-zone" for="assignment-brief">
+          <input id="assignment-brief" name="assignmentBrief" class="file-input" type="file" accept=".pdf,.docx,.txt" aria-label="Upload assignment brief" data-file-input required>
+          <span class="upload-empty-state">
+            <span class="upload-icon" aria-hidden="true">BRF</span>
+            <strong>Assignment Brief</strong>
+            <span>Drag and drop your brief or click to browse.</span>
+            <small>Supported formats: PDF, DOCX, TXT</small>
+          </span>
+        </label>
+
+        <div class="uploaded-state">
+          <span class="uploaded-check" aria-hidden="true">&#10003;</span>
+          <div class="uploaded-file-copy">
+            <strong data-file-name>Assignment brief</strong>
+            <span data-file-type>Assignment brief uploaded</span>
+          </div>
+          <label class="file-action-link" for="assignment-brief">Replace</label>
+          <button class="remove-file-button" type="button" aria-label="Remove assignment brief" data-remove-file>&times;</button>
+        </div>
+      </article>
+
+      <article class="upload-card" data-upload-card data-file-key="rubric">
+        <label class="upload-drop-zone" for="marking-rubric">
+          <input id="marking-rubric" name="markingRubric" class="file-input" type="file" accept=".pdf,.docx,.txt" aria-label="Upload marking rubric" data-file-input required>
+          <span class="upload-empty-state">
+            <span class="upload-icon" aria-hidden="true">RUB</span>
+            <strong>Marking Rubric</strong>
+            <span>Drag and drop your rubric or click to browse.</span>
+            <small>Supported formats: PDF, DOCX, TXT</small>
+          </span>
+        </label>
+
+        <div class="uploaded-state">
+          <span class="uploaded-check" aria-hidden="true">&#10003;</span>
+          <div class="uploaded-file-copy">
+            <strong data-file-name>Marking rubric</strong>
+            <span data-file-type>Marking rubric uploaded</span>
+          </div>
+          <label class="file-action-link" for="marking-rubric">Replace</label>
+          <button class="remove-file-button" type="button" aria-label="Remove marking rubric" data-remove-file>&times;</button>
+        </div>
+      </article>
+
+      <article class="upload-card" data-upload-card data-file-key="draft">
+        <label class="upload-drop-zone" for="assignment-draft">
+          <input id="assignment-draft" name="studentDraft" class="file-input" type="file" accept=".pdf,.docx,.txt" aria-label="Upload student draft" data-file-input required>
+          <span class="upload-empty-state">
+            <span class="upload-icon" aria-hidden="true">DOC</span>
+            <strong>Student Draft</strong>
+            <span>Drag and drop your draft or click to browse.</span>
+            <small>Supported formats: PDF, DOCX, TXT</small>
+          </span>
+        </label>
+
+        <div class="uploaded-state">
+          <span class="uploaded-check" aria-hidden="true">&#10003;</span>
+          <div class="uploaded-file-copy">
+            <strong data-file-name>Student draft</strong>
+            <span data-file-type>Student draft uploaded</span>
+          </div>
+          <label class="file-action-link" for="assignment-draft">Replace</label>
+          <button class="remove-file-button" type="button" aria-label="Remove student draft" data-remove-file>&times;</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <div class="upload-actions">
+    <button class="btn btn-primary analyse-button" type="submit" data-analyse-button disabled>Check My Assignment</button>
+    <p data-upload-note>Student information and all three files are required before AI analysis can begin.</p>
+  </div>
+</form>

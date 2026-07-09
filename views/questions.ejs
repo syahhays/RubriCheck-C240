@@ -8,49 +8,7 @@
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-  <header class="site-header">
-    <div class="container nav-bar">
-      <a class="brand" href="/" aria-label="RubriCheck AI home">
-        <img class="brand-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
-        <span class="brand-name">Rubri<span>Check</span> <small>AI</small></span>
-      </a>
-
-      <nav class="main-nav" aria-label="Main navigation">
-        <a class="nav-link" href="/">Home</a>
-        <a class="nav-link" href="/dashboard">Dashboard</a>
-        <a class="nav-link" href="/upload">New Review</a>
-      </nav>
-
-      <div class="auth-area" aria-label="Account actions">
-        <button class="login-button" type="button" data-login-open>Log In</button>
-
-        <a class="user-chip hidden" href="/dashboard" aria-label="Open user dashboard" data-user-chip>
-          <span class="user-icon">DS</span>
-          <span>Demo Student</span>
-        </a>
-      </div>
-    </div>
-  </header>
-
-  <div class="modal-overlay hidden" data-login-modal>
-    <section class="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
-      <button class="modal-close" type="button" aria-label="Close login" data-login-close>&times;</button>
-
-      <img class="modal-logo" src="/images/RubriCheck%20Logo.png" alt="RubriCheck AI logo">
-      <h2 id="login-title">Log in to RubriCheck AI</h2>
-      <p>This is a frontend demo login. No real account or password is needed yet.</p>
-
-      <form class="login-form">
-        <label for="demo-email">Email</label>
-        <input id="demo-email" type="email" value="student@myrp.edu.sg" readonly>
-
-        <label for="demo-password">Password</label>
-        <input id="demo-password" type="password" value="password" readonly>
-
-        <button class="btn btn-primary" type="button" data-demo-login>Use Demo Login</button>
-      </form>
-    </section>
-  </div>
+  <%- include('partials/header', { activePage: '' }) %>
 
   <main class="questions-page">
     <section class="questions-shell container">
@@ -134,7 +92,7 @@
       </section>
 
       <section class="questions-cta">
-        <span aria-hidden="true">★</span>
+        <span aria-hidden="true">AI</span>
         <h2>Ready to review another assignment?</h2>
         <p>Upload a new assignment draft and rubric to get another AI-powered review.</p>
         <a class="btn btn-primary" href="/upload">Review another assignment</a>
