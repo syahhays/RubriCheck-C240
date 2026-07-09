@@ -1,4 +1,4 @@
-const pdf = require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
 const mammoth = require('mammoth');
 const { MAX_DOC_CHARS } = require('../config/appConfig');
 
@@ -10,12 +10,19 @@ async function extractDocumentText(file) {
   }
 
   if (mime === 'application/pdf') {
+    let parser;
+
     try {
-      const data = await pdf(file.buffer);
-      return data && data.text ? data.text : '';
+      parser = new PDFParse({ data: file.buffer });
+      const result = await parser.getText({ pageJoiner: '' });
+      return result && result.text ? result.text : '';
     } catch (err) {
       console.warn('PDF text extraction failed for', file.originalname, err.message);
       return '';
+    } finally {
+      if (parser) {
+        await parser.destroy();
+      }
     }
   }
 

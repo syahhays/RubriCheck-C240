@@ -6,11 +6,22 @@ const { searchChunks } = require('../services/chromaService');
 const { generateGeminiFollowUp } = require('../services/geminiService');
 const { getReview } = require('../services/reviewStore');
 
-const FOLLOW_UP_MATCH_COUNT = 8;
+const FOLLOW_UP_MATCH_LIMITS = {
+  'Assignment Brief': 3,
+  'Marking Rubric': 3,
+  'Student Assignment Draft': 4
+};
 
 async function retrieveFollowUpContext(submissionId, question, fallbackDocuments) {
   const questionEmbedding = await embedText(question);
-  const matches = await searchChunks(questionEmbedding, null, submissionId, FOLLOW_UP_MATCH_COUNT);
+
+  const matches = (
+    await Promise.all(
+      Object.entries(FOLLOW_UP_MATCH_LIMITS).map(([documentType, limit]) =>
+        searchChunks(questionEmbedding, documentType, submissionId, limit)
+      )
+    )
+  ).flat();
 
   if (matches.length === 0) {
     return fallbackDocuments;

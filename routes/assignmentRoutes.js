@@ -219,7 +219,24 @@ router.post('/check-assignment', upload.fields(requiredUploadFields), async (req
 
     const reviewQuery = 'Check whether the student draft meets the assignment brief and marking rubric requirements.';
     const queryEmbedding = await embedText(reviewQuery);
-    const relevantChunks = await searchChunks(queryEmbedding, null, submissionId, 8);
+
+    // Query each document type separately so rubric/brief chunks (often
+    // numerous due to numbered criteria) can't crowd the student draft out
+    // of the results - the draft must always be represented.
+    const retrievalLimits = {
+      'Assignment Brief': 4,
+      'Marking Rubric': 4,
+      'Student Assignment Draft': 8
+    };
+
+    const relevantChunks = (
+      await Promise.all(
+        Object.entries(retrievalLimits).map(([documentType, limit]) =>
+          searchChunks(queryEmbedding, documentType, submissionId, limit)
+        )
+      )
+    ).flat();
+
     const documentsForFeedback = relevantChunks.length > 0
       ? buildRetrievedDocuments(relevantChunks)
       : reviewDocuments;

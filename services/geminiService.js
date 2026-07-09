@@ -61,11 +61,32 @@ function parseJsonFeedback(text) {
     try {
       return JSON.parse(candidate);
     } catch (error) {
-      // Keep trying the next candidate. Gemini may wrap JSON in short explanatory text.
+      // Retry after stripping trailing commas, a common near-miss from the model.
+      try {
+        return JSON.parse(candidate.replace(/,(\s*[}\]])/g, '$1'));
+      } catch (innerError) {
+        // Keep trying the next candidate. Gemini may wrap JSON in short explanatory text.
+      }
     }
   }
 
   return null;
+}
+
+// Best-effort unescape for when JSON parsing fails entirely and we fall back
+// to the raw response text, which still contains literal JSON escape
+// sequences (e.g. a two-character "\n" instead of a real line break).
+function unescapeJsonLikeText(value) {
+  if (typeof value !== 'string') {
+    return '';
+  }
+
+  return value
+    .replace(/\\r\\n/g, '\n')
+    .replace(/\\n/g, '\n')
+    .replace(/\\t/g, ' ')
+    .replace(/\\"/g, '"')
+    .replace(/\\\\/g, '\\');
 }
 
 function extractPercent(text, label) {
@@ -95,11 +116,19 @@ function extractNumberedList(text, heading) {
 
 function normalizeFeedbackSummary(rawSummary, originalText) {
   const source = rawSummary && typeof rawSummary === 'object' ? rawSummary : {};
+
+  // Prefer extracting missing fields from the already-parsed fullFeedback
+  // text (real newlines) over the raw response. Only fall back to the raw
+  // text - unescaped, since JSON parsing failed - when there's nothing else.
+  const extractionText = cleanText(source.fullFeedback)
+    ? source.fullFeedback
+    : unescapeJsonLikeText(originalText);
+
   const completionPercentage = clampPercent(source.completionPercentage)
-    ?? extractPercent(originalText, 'Completion Percentage')
-    ?? extractPercent(originalText, 'Overall Completion Percentage');
+    ?? extractPercent(extractionText, 'Completion Percentage')
+    ?? extractPercent(extractionText, 'Overall Completion Percentage');
   const readinessScore = clampPercent(source.readinessScore)
-    ?? extractPercent(originalText, 'Readiness Score')
+    ?? extractPercent(extractionText, 'Readiness Score')
     ?? completionPercentage;
 
   return {
@@ -107,10 +136,10 @@ function normalizeFeedbackSummary(rawSummary, originalText) {
     readinessScore,
     readinessLevel: cleanText(source.readinessLevel) || 'Needs Review',
     finalRecommendation: cleanText(source.finalRecommendation) || 'Review Before Submission',
-    topPriorities: cleanList(source.topPriorities, extractNumberedList(originalText, 'Top 3 Priorities').slice(0, 3)),
-    checklist: cleanList(source.checklist, extractNumberedList(originalText, 'Before Submission Checklist')),
-    missingWeakAreas: cleanList(source.missingWeakAreas, extractNumberedList(originalText, 'Improvement Suggestions')),
-    fullFeedback: cleanText(source.fullFeedback) ? source.fullFeedback.trim() : originalText
+    topPriorities: cleanList(source.topPriorities, extractNumberedList(extractionText, 'Top 3 Priorities').slice(0, 3)),
+    checklist: cleanList(source.checklist, extractNumberedList(extractionText, 'Before Submission Checklist')),
+    missingWeakAreas: cleanList(source.missingWeakAreas, extractNumberedList(extractionText, 'Improvement Suggestions')),
+    fullFeedback: cleanText(source.fullFeedback) ? source.fullFeedback.trim() : extractionText
   };
 }
 
