@@ -7,6 +7,7 @@ const pageRoutes = require('./routes/pageRoutes');
 const assignmentRoutes = require('./routes/assignmentRoutes');
 const followUpRoutes = require('./routes/followUpRoutes');
 const { uploadErrorHandler } = require('./middleware/errorHandler');
+const { ensureLocalChromaServer } = require('./services/localChromaServer');
 
 const app = express();
 
@@ -22,6 +23,15 @@ app.use(assignmentRoutes);
 app.use(followUpRoutes);
 app.use(uploadErrorHandler);
 
-app.listen(PORT, () => {
-  console.log(`RubriCheck AI is running at http://localhost:${PORT}`);
+async function startApp() {
+  await ensureLocalChromaServer();
+
+  app.listen(PORT, () => {
+    console.log(`RubriCheck AI is running at http://localhost:${PORT}`);
+  });
+}
+
+startApp().catch((error) => {
+  console.error('Unable to start RubriCheck AI:', error);
+  process.exit(1);
 });
