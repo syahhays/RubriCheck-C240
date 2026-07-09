@@ -10,5 +10,6 @@ module.exports = {
   followUpFailed: 'Unable to answer the follow-up question. Please try again.',
   geminiError: 'Gemini returned an error.',
   geminiFeedbackMissing: 'Gemini did not return feedback text.',
-  geminiFollowUpMissing: 'Gemini did not return a follow-up answer.'
+  geminiFollowUpMissing: 'Gemini did not return a follow-up answer.',
+  geminiQuestionsMissing: 'Gemini did not return lecturer questions.'
 };

@@ -54,9 +54,22 @@
 
   <main class="questions-page">
     <section class="questions-shell container">
+      <%
+        const questionReview = typeof review === 'undefined' ? null : review;
+        const questionItems = typeof questions === 'undefined' ? [] : questions;
+        const generatedQuestions = Array.isArray(questionItems) ? questionItems : [];
+        const questionError = typeof error === 'undefined' ? null : error;
+        const questionReviewId = typeof reviewId === 'undefined' ? null : reviewId;
+        const questionStudent = questionReview && questionReview.studentInfo ? questionReview.studentInfo : {};
+        const questionSummary = questionReview && questionReview.summary ? questionReview.summary : {};
+        const focusAreas = Array.isArray(questionSummary.topPriorities) && questionSummary.topPriorities.length > 0
+          ? questionSummary.topPriorities.slice(0, 3).join(', ')
+          : 'Generated from feedback gaps';
+      %>
+
       <div class="questions-header">
         <div>
-          <p class="questions-kicker">Business Analytics Report - Q2 2025</p>
+          <p class="questions-kicker"><%= questionStudent.moduleCode || 'RubriCheck Review' %><%= questionStudent.deadline ? ` - ${questionStudent.deadline}` : '' %></p>
           <h1>Lecturer Question Prep</h1>
           <p>Practise possible presentation and viva questions generated from your assignment review.</p>
         </div>
@@ -72,91 +85,52 @@
           <dl>
             <div>
               <dt>Assignment</dt>
-              <dd>Business Analytics Report</dd>
+              <dd><%= questionStudent.assignmentName || 'Not provided' %></dd>
             </div>
             <div>
               <dt>Readiness Score</dt>
-              <dd>78%</dd>
+              <dd><%= typeof questionSummary.readinessScore === 'number' ? `${questionSummary.readinessScore}%` : 'Not provided' %></dd>
             </div>
             <div>
               <dt>Focus Areas</dt>
-              <dd>Explanation depth, evidence, conclusion clarity</dd>
+              <dd><%= focusAreas %></dd>
             </div>
           </dl>
         </div>
       </section>
 
       <div class="questions-toolbar">
-        <strong><span data-question-count>6</span> questions generated</strong>
-        <button class="regenerate-button" type="button" data-regenerate-questions>Regenerate Questions</button>
+        <strong><span data-question-count><%= generatedQuestions.length %></span> questions generated</strong>
+        <% if (questionReviewId) { %>
+          <a class="regenerate-button" href="/questions?reviewId=<%= encodeURIComponent(questionReviewId) %>&refresh=1">Regenerate Questions</a>
+        <% } %>
       </div>
 
       <section class="question-list" data-question-list aria-label="AI-generated lecturer questions">
-        <article class="question-card">
-          <span class="question-number">1</span>
-          <div>
-            <div class="question-meta">
-              <span>Analysis</span>
-              <em>Medium</em>
-            </div>
-            <h2>Why did you choose this approach for your analysis?</h2>
-          </div>
-        </article>
-
-        <article class="question-card">
-          <span class="question-number">2</span>
-          <div>
-            <div class="question-meta">
-              <span>Rubric</span>
-              <em>Hard</em>
-            </div>
-            <h2>How does your solution meet the rubric criteria?</h2>
-          </div>
-        </article>
-
-        <article class="question-card">
-          <span class="question-number">3</span>
-          <div>
-            <div class="question-meta">
-              <span>Evidence</span>
-              <em>Easy</em>
-            </div>
-            <h2>What evidence supports your main findings?</h2>
-          </div>
-        </article>
-
-        <article class="question-card">
-          <span class="question-number">4</span>
-          <div>
-            <div class="question-meta">
-              <span>Reflection</span>
-              <em>Medium</em>
-            </div>
-            <h2>What limitations did you identify in your assignment?</h2>
-          </div>
-        </article>
-
-        <article class="question-card">
-          <span class="question-number">5</span>
-          <div>
-            <div class="question-meta">
-              <span>Improvement</span>
-              <em>Medium</em>
-            </div>
-            <h2>How would you improve your work if given more time?</h2>
-          </div>
-        </article>
-
-        <article class="question-card">
-          <span class="question-number">6</span>
-          <div>
-            <div class="question-meta">
-              <span>Conclusion</span>
-              <em>Hard</em>
-            </div>
-            <h2>How does your conclusion link back to your objectives?</h2>
-          </div>
-        </article>
+        <% if (questionError) { %>
+          <article class="question-empty-card">
+            <h2>Questions could not be generated</h2>
+            <p><%= questionError %></p>
+          </article>
+        <% } else if (generatedQuestions.length === 0) { %>
+          <article class="question-empty-card">
+            <h2>No questions available yet</h2>
+            <p>Generate a feedback report first, then return here to prepare lecturer questions.</p>
+          </article>
+        <% } else { %>
+          <% generatedQuestions.forEach((question, index) => { %>
+            <article class="question-card">
+              <span class="question-number"><%= index + 1 %></span>
+              <div>
+                <div class="question-meta">
+                  <span><%= question.tag %></span>
+                  <em><%= question.level %></em>
+                </div>
+                <h2><%= question.text %></h2>
+              </div>
+            </article>
+          <% }); %>
+        <% } %>
       </section>
 
       <section class="questions-cta">

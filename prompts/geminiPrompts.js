@@ -79,7 +79,42 @@ ${ethicalRules}
 Do not write or rewrite the student's assignment. Do not add requirements that are not present in the documents.`;
 }
 
+function buildQuestionPrompt() {
+  return `You are RubriCheck AI generating likely lecturer or viva questions for a student.
+
+Use ONLY:
+- The uploaded Assignment Brief, Marking Rubric, and Student Assignment Draft excerpts.
+- The generated feedback report.
+
+Generate questions that help the student prepare to explain, justify, and defend their assignment choices.
+
+${ethicalRules}
+
+Return ONLY valid JSON. Do not wrap it in markdown fences.
+
+Use this exact JSON shape:
+
+{
+  "questions": [
+    {
+      "tag": "Rubric",
+      "level": "Medium",
+      "text": "How does your submission meet the rubric requirement for evidence?"
+    }
+  ]
+}
+
+Field rules:
+- Generate exactly 6 questions.
+- tag must be one of: "Rubric", "Evidence", "Method", "Analysis", "Reflection", "Improvement", "Conclusion".
+- level must be one of: "Easy", "Medium", "Hard".
+- text must be a direct question.
+- Questions must be based on the uploaded documents or generated feedback.
+- Do not ask the student to create new assignment content.`;
+}
+
 module.exports = {
   finalPrompt,
-  buildFollowUpPrompt
+  buildFollowUpPrompt,
+  buildQuestionPrompt
 };

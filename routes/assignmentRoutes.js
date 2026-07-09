@@ -63,6 +63,77 @@ function renderStoredReview(res, reviewId, review) {
   });
 }
 
+function sanitizeDownloadName(value, fallback) {
+  const cleaned = String(value || '')
+    .trim()
+    .replace(/[^a-z0-9-_]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+
+  return cleaned || fallback;
+}
+
+function buildDownloadText(review) {
+  const studentInfo = review.studentInfo || {};
+  const summary = review.summary || {};
+  const lines = [
+    'RubriCheck AI Feedback Report',
+    '',
+    `Student: ${studentInfo.studentName || 'Not provided'}`,
+    `Module: ${studentInfo.moduleCode || 'Not provided'}`,
+    `Assignment: ${studentInfo.assignmentName || 'Not provided'}`,
+    `Deadline: ${studentInfo.deadline || 'Not provided'}`,
+    '',
+    `Completion Percentage: ${summary.completionPercentage ?? 'Not provided'}%`,
+    `Readiness Score: ${summary.readinessScore ?? 'Not provided'}%`,
+    `Readiness Level: ${summary.readinessLevel || 'Not provided'}`,
+    `Final Recommendation: ${summary.finalRecommendation || 'Not provided'}`,
+    '',
+    'Top 3 Priorities:',
+    ...(Array.isArray(summary.topPriorities) ? summary.topPriorities.map((item, index) => `${index + 1}. ${item}`) : ['Not provided.']),
+    '',
+    'Before-Submission Checklist:',
+    ...(Array.isArray(summary.checklist) ? summary.checklist.map((item, index) => `${index + 1}. ${item}`) : ['Not provided.']),
+    '',
+    'Missing or Weak Areas:',
+    ...(Array.isArray(summary.missingWeakAreas) ? summary.missingWeakAreas.map((item, index) => `${index + 1}. ${item}`) : ['Not provided.']),
+    '',
+    'Full Feedback:',
+    review.report || summary.fullFeedback || 'Not provided.'
+  ];
+
+  return lines.join('\n');
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function buildDownloadHtml(review) {
+  const text = buildDownloadText(review);
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RubriCheck AI Feedback Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.55; max-width: 860px; margin: 40px auto; padding: 0 20px; color: #172033; }
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+  </style>
+</head>
+<body>
+  <pre>${escapeHtml(text)}</pre>
+</body>
+</html>`;
+}
+
 router.get('/check-assignment', (req, res) => {
   const latest = getLatestReview();
 
@@ -71,6 +142,30 @@ router.get('/check-assignment', (req, res) => {
   }
 
   return renderStoredReview(res, latest.reviewId, latest.review);
+});
+
+router.get('/check-assignment/:reviewId/download.txt', (req, res) => {
+  const review = getReview(req.params.reviewId);
+
+  if (!review) {
+    return res.status(404).type('text/plain').send(messages.reviewExpired);
+  }
+
+  const fileName = `${sanitizeDownloadName(review.studentInfo?.assignmentName, 'rubricheck-report')}.txt`;
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  return res.type('text/plain').send(buildDownloadText(review));
+});
+
+router.get('/check-assignment/:reviewId/download.html', (req, res) => {
+  const review = getReview(req.params.reviewId);
+
+  if (!review) {
+    return res.status(404).type('text/plain').send(messages.reviewExpired);
+  }
+
+  const fileName = `${sanitizeDownloadName(review.studentInfo?.assignmentName, 'rubricheck-report')}.html`;
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  return res.type('html').send(buildDownloadHtml(review));
 });
 
 router.get('/check-assignment/:reviewId', (req, res) => {

@@ -1,6 +1,6 @@
 const { GEMINI_API_KEY, GEMINI_MODEL } = require('../config/appConfig');
 const messages = require('../constants/messages');
-const { buildFollowUpPrompt, finalPrompt } = require('../prompts/geminiPrompts');
+const { buildFollowUpPrompt, buildQuestionPrompt, finalPrompt } = require('../prompts/geminiPrompts');
 
 function buildDocumentParts(documents) {
   const documentParts = [];
@@ -124,6 +124,46 @@ function parseFeedbackResponse(text) {
   };
 }
 
+function normalizeQuestion(value) {
+  if (!value || typeof value !== 'object') {
+    return null;
+  }
+
+  const tag = cleanText(value.tag) || 'Review';
+  const level = cleanText(value.level) || 'Medium';
+  const questionText = cleanText(value.text);
+
+  if (!questionText) {
+    return null;
+  }
+
+  return {
+    tag,
+    level,
+    text: questionText
+  };
+}
+
+function parseQuestionResponse(text) {
+  const parsedJson = parseJsonFeedback(text);
+  const sourceQuestions = parsedJson && Array.isArray(parsedJson.questions)
+    ? parsedJson.questions
+    : [];
+  const questions = sourceQuestions
+    .map(normalizeQuestion)
+    .filter(Boolean)
+    .slice(0, 6);
+
+  if (questions.length > 0) {
+    return questions;
+  }
+
+  return extractNumberedList(text, '')
+    .map((item) => normalizeQuestion({ tag: 'Review', level: 'Medium', text: item }))
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
 async function generateContent(parts) {
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
@@ -190,7 +230,28 @@ async function generateGeminiFollowUp(review, question, groundedChunks) {
   return text;
 }
 
+async function generateGeminiQuestions(review, groundedChunks) {
+  const text = await generateContent([
+    ...buildDocumentParts(groundedChunks),
+    { text: `Generated Feedback Report:\n${review.report}` },
+    { text: buildQuestionPrompt() }
+  ]);
+
+  if (!text) {
+    throw new Error(messages.geminiQuestionsMissing);
+  }
+
+  const questions = parseQuestionResponse(text);
+
+  if (questions.length === 0) {
+    throw new Error(messages.geminiQuestionsMissing);
+  }
+
+  return questions;
+}
+
 module.exports = {
   generateGeminiFeedback,
-  generateGeminiFollowUp
+  generateGeminiFollowUp,
+  generateGeminiQuestions
 };

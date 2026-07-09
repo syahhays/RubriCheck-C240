@@ -4,8 +4,29 @@ const ROOT_DIR = path.join(__dirname, '..');
 const PORT = process.env.PORT || 3000;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const CHROMA_HOST = process.env.CHROMA_HOST || 'localhost';
-const CHROMA_PORT = Number(process.env.CHROMA_PORT) || 8000;
+
+function parseChromaUrl(chromaUrl) {
+  if (!chromaUrl) {
+    return null;
+  }
+
+  try {
+    return new URL(chromaUrl);
+  } catch (error) {
+    throw new Error(`Invalid CHROMA_URL: ${chromaUrl}`);
+  }
+}
+
+const parsedChromaUrl = parseChromaUrl(process.env.CHROMA_URL);
+const CHROMA_HOST = parsedChromaUrl
+  ? parsedChromaUrl.hostname
+  : process.env.CHROMA_HOST || 'localhost';
+const CHROMA_PORT = Number(
+  parsedChromaUrl && parsedChromaUrl.port
+    ? parsedChromaUrl.port
+    : process.env.CHROMA_PORT
+) || 8000;
+const CHROMA_URL = process.env.CHROMA_URL || `http://${CHROMA_HOST}:${CHROMA_PORT}`;
 const CHROMA_COLLECTION = process.env.CHROMA_COLLECTION || 'rubricheck_documents';
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
 const OLLAMA_EMBEDDING_MODEL = process.env.OLLAMA_EMBEDDING_MODEL || 'nomic-embed-text';
@@ -31,6 +52,7 @@ module.exports = {
   PORT,
   GEMINI_MODEL,
   GEMINI_API_KEY,
+  CHROMA_URL,
   CHROMA_HOST,
   CHROMA_PORT,
   CHROMA_COLLECTION,

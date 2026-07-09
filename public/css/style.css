@@ -2654,6 +2654,13 @@ a {
   margin-top: 22px;
 }
 
+.report-download-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+
 /* Lecturer question prep page */
 .questions-page {
   min-height: calc(100vh - 64px);
@@ -2842,6 +2849,25 @@ a {
   color: #172033;
   font-size: 16px;
   line-height: 1.35;
+}
+
+.question-empty-card {
+  padding: 26px;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.question-empty-card h2 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 20px;
+}
+
+.question-empty-card p {
+  margin: 0;
+  color: #64748b;
 }
 
 .questions-cta {

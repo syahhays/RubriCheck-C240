@@ -280,6 +280,13 @@
             <a class="btn btn-secondary" href="<%= generatedReviewId ? `/questions?reviewId=${encodeURIComponent(generatedReviewId)}` : '/questions' %>">Prepare Lecturer Questions</a>
           </div>
 
+          <% if (generatedReviewId) { %>
+            <div class="report-download-row" aria-label="Download feedback report">
+              <a class="btn btn-secondary" href="/check-assignment/<%= encodeURIComponent(generatedReviewId) %>/download.txt">Download TXT</a>
+              <a class="btn btn-secondary" href="/check-assignment/<%= encodeURIComponent(generatedReviewId) %>/download.html">Download HTML</a>
+            </div>
+          <% } %>
+
           <% if (uploadedFiles) { %>
             <div class="uploaded-file-summary compact-files">
               <div>

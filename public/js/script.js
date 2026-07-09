@@ -29,24 +29,6 @@ const DEMO_UPLOAD_FILES = {
   }
 };
 
-const DEMO_INITIAL_QUESTIONS = [
-  { tag: "Analysis", level: "Medium", text: "Why did you choose this approach for your analysis?" },
-  { tag: "Rubric", level: "Hard", text: "How does your solution meet the rubric criteria?" },
-  { tag: "Evidence", level: "Easy", text: "What evidence supports your main findings?" },
-  { tag: "Reflection", level: "Medium", text: "What limitations did you identify in your assignment?" },
-  { tag: "Improvement", level: "Medium", text: "How would you improve your work if given more time?" },
-  { tag: "Conclusion", level: "Hard", text: "How does your conclusion link back to your objectives?" }
-];
-
-const DEMO_REGENERATED_QUESTIONS = [
-  { tag: "Analysis", level: "Medium", text: "Which part of your analysis most strongly supports your final recommendation?" },
-  { tag: "Rubric", level: "Hard", text: "Which rubric criterion was the most challenging to meet, and how did you address it?" },
-  { tag: "Evidence", level: "Medium", text: "How reliable is the evidence you used to support your findings?" },
-  { tag: "Reflection", level: "Easy", text: "What did you learn from reviewing the gaps in your first draft?" },
-  { tag: "Improvement", level: "Medium", text: "What specific change would improve your explanation depth the most?" },
-  { tag: "Conclusion", level: "Hard", text: "How would you defend your conclusion if a lecturer challenged your assumptions?" }
-];
-
 const frontendState = {
   selectedFiles: {
     brief: null,
@@ -76,9 +58,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const reportTabs = document.querySelectorAll("[data-report-tab]");
   const reportPanels = document.querySelectorAll("[data-report-panel]");
   const downloadChecklistButtons = document.querySelectorAll("[data-download-checklist]");
-  const regenerateQuestionsButton = document.querySelector("[data-regenerate-questions]");
-  const questionList = document.querySelector("[data-question-list]");
-  const questionCount = document.querySelector("[data-question-count]");
   const followUpForm = document.querySelector("[data-follow-up-form]");
   const followUpSubmit = document.querySelector("[data-follow-up-submit]");
   const followUpAnswer = document.querySelector("[data-follow-up-answer]");
@@ -507,39 +486,6 @@ document.addEventListener("DOMContentLoaded", () => {
           followUpSubmit.textContent = defaultSubmitText || "Send";
         }
       }
-    });
-  }
-
-  function renderQuestions(questions) {
-    if (!questionList) {
-      return;
-    }
-
-    questionList.innerHTML = questions.map((question, index) => `
-      <article class="question-card">
-        <span class="question-number">${index + 1}</span>
-        <div>
-          <div class="question-meta">
-            <span>${question.tag}</span>
-            <em>${question.level}</em>
-          </div>
-          <h2>${question.text}</h2>
-        </div>
-      </article>
-    `).join("");
-
-    if (questionCount) {
-      questionCount.textContent = String(questions.length);
-    }
-  }
-
-  renderQuestions(DEMO_INITIAL_QUESTIONS);
-
-  if (regenerateQuestionsButton) {
-    regenerateQuestionsButton.addEventListener("click", () => {
-      // Future AI integration point: replace this array with AI-generated questions.
-      renderQuestions(DEMO_REGENERATED_QUESTIONS);
-      window.alert("New demo questions generated.");
     });
   }
 
