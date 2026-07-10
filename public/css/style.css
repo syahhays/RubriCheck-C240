@@ -3114,6 +3114,17 @@ a {
   border-color: var(--blue);
 }
 
+.form-field-hint {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.form-field-hint a {
+  color: var(--blue);
+  font-weight: 700;
+}
+
 .reminder-detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
