@@ -2,8 +2,7 @@
 // Future AI integration point: add the backend AI analysis endpoint here later.
 const AI_ANALYSIS_API_URL = "";
 
-// Future n8n webhook integration point: add the n8n reminder webhook URL here later.
-const N8N_WEBHOOK_URL = "";
+const N8N_WEBHOOK_URL = "https://n8ngc.codeblazar.org/webhook/reminder";
 
 const DEMO_UPLOAD_FILES = {
   brief: {
